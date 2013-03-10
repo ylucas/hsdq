@@ -1,60 +1,83 @@
-module Hsdq
+require 'redis'
+require 'eventmachine'
 
-  def redis
-    @redis ||= Redis.new
+module Hsdq
+  Thread.abort_on_exception = true # Uncomment for debugging
+
+  # establish listener connection
+  def cx_listener
+    @cx_listener ||= Redis.new
+  end
+
+  # establish sender connection
+  def cx_sender
+    @cx_sender ||= Redis.new
   end
 
   # Start hsdq to listen to channel. When a message is obtained, hsd_task will be called
   # If threaded is true the hsd_task will run in a thread otherwise it will be blocking
   def hsdq_start(channel, threaded=true, callback=:hsdq_task)
-    @redis ||= Redis.new
+    hsdq_run!
     hsdq_loop(channel, threaded)
   end
 
-  def hsdq_stop
-    hsdq_run false
+  # run the loop only one time for testing pupose
+  def hsdq_start_one(channel, threaded=true, callback=:hsdq_task)
+    hsdq_stop!
+    hsdq_loop(channel, threaded)
   end
 
-  def hsdq_run(value=nil)
-    @hsdq_run ||= true
-    @hsdq_run = value unless nil == value
-    @hsdq_run
+  def hsdq_stop!
+    @hsdq_running = false
+  end
+
+  def hsdq_run!
+    @hsdq_running = true
+  end
+
+  def hsdq_running?
+    !!@hsdq_running
+  end
+
+  def hsdq_stopped?
+    !@hsdq_running
   end
 
   def hsdq_send(channel, message)
-    @channel = channel
-    @message = message
-  end
-
-  def check_send
-    @redis = Redis.new unless @redis
-    if @channel && @message
-      @redis.lpush @channel, @message
-      @channel = nil
-      @message = nil
+    if channel && message
+      cx_sender.rpush channel, message
     end
   end
 
   def hsdq_task(message)
-    p "do something here"
+    p "do something here #{message}"
   end
 
   private
     # Listening loop
     def hsdq_loop(channel, threaded=true)
-      p "listening started"
-      while hsdq_run do
-        sleep 1
-        message = @redis.lpop(channel)
-        if threaded
-          Thread.new do
+      ensure_reactor
+      EM.run do
+        p "listening started"
+        loop  do
+          message = cx_listener.blpop(channel, :timeout => 10 )
+          if threaded
+            Thread.new do
+              hsdq_task(message)
+            end
+          else
             hsdq_task(message)
           end
-        else
-          hsdq_task(message)
+          break if hsdq_stopped?
         end
-        check_send
       end
+      EM.stop
+    end
+
+    def ensure_reactor
+      # Start em in a thread and make sure it is running
+      Thread.new { EM.run } unless EM.reactor_running?
+      sleep 0.1             until  EM.reactor_running?
     end
 
 end
