@@ -16,15 +16,17 @@ module Hsdq
 
   # Start hsdq to listen to channel. When a message is obtained, hsd_task will be called
   # If threaded is true the hsd_task will run in a thread otherwise it will be blocking
-  def hsdq_start(channel, threaded=true, callback=:hsdq_task)
+  def hsdq_start(channel, options={})
+    hsdq_opts(options)
     hsdq_run!
-    hsdq_loop(channel, threaded)
+    hsdq_loop(channel)
   end
 
   # run the loop only one time for testing pupose
-  def hsdq_start_one(channel, threaded=true, callback=:hsdq_task)
+  def hsdq_start_one(channel, options={})
+    hsdq_opts(options)
     hsdq_stop!
-    hsdq_loop(channel, threaded)
+    hsdq_loop(channel)
   end
 
   def hsdq_stop!
@@ -53,31 +55,37 @@ module Hsdq
     p "do something here #{message}"
   end
 
+  def hsdq_opts(opts={})
+    # todo here read from yml file
+    @hsdqopts ||= default_opts.merge opts
+  end
+
+  def default_opts
+    @default_opts ||= {
+      :threaded => false,
+      :timeout  => 60
+    }
+  end
+
   private
     # Listening loop
-    def hsdq_loop(channel, threaded=true)
-      ensure_reactor
-      EM.run do
-        p "listening started"
-        loop  do
-          message = cx_listener.blpop(channel, :timeout => 10 )
-          if threaded
-            Thread.new do
-              hsdq_task(message)
-            end
-          else
+    def hsdq_loop(channel)
+      p "listening started"
+      loop  do
+        message = cx_listener.blpop(channel, hsdq_opts[:timeout] )
+        if hsdq_opts[:threaded]
+          Thread.new do
             hsdq_task(message)
           end
-          break if hsdq_stopped?
+        else
+          hsdq_task(message)
         end
+        break if hsdq_stopped?
       end
-      EM.stop
     end
 
-    def ensure_reactor
-      # Start em in a thread and make sure it is running
-      Thread.new { EM.run } unless EM.reactor_running?
-      sleep 0.1             until  EM.reactor_running?
-    end
+  def start_listener
+    Thread.new { hsdq_start(channel, {:threaded => true}) }
+  end
 
 end

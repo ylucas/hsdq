@@ -6,11 +6,11 @@ require 'hsdq.rb'
 RSpec.describe Hsdq do
 
   class TestClient
-    extend Hsdq
+    include Hsdq
     def name; 'TestClient'; end
   end
 
-  let(:obj) { TestClient }
+  let(:obj) { TestClient.new }
 
   describe "#cx_listener connection" do
     it { expect(obj.cx_listener).to be_an_instance_of Redis }
@@ -45,8 +45,16 @@ RSpec.describe Hsdq do
     it "listen to a channel" do
       expect(obj).to receive(:hsdq_task).exactly(1).times
       Redis.new.rpush("my-channel", "my message")
-      obj.hsdq_start_one("my-channel", false)
+      obj.hsdq_start_one("my-channel")
     end
+  end
+
+  describe "#default_opts" do
+    it { expect( obj.default_opts).to eq ({:threaded => false, :timeout  => 60}) }
+  end
+
+  describe "#hsdq_opts" do
+    it { expect( obj.hsdq_opts({:threaded=>true})).to eq ({:threaded => true, :timeout  => 60}) }
   end
 
 end
