@@ -1,5 +1,6 @@
 require 'redis'
 require 'hsdq'
+require 'json'
 
 require_relative '../spec_helper'
 
