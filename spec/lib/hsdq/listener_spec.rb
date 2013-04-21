@@ -1,4 +1,4 @@
-require_relative '../../shared/hdsq_shared_setup'
+require_relative '../../shared/hsdq_shared_setup'
 
 RSpec.describe Hsdq::Listener do
   include_context "setup_shared"
@@ -25,14 +25,6 @@ RSpec.describe Hsdq::Listener do
       Redis.new.rpush("my-channel", "my message")
       obj.hsdq_start_one("my-channel", test_options)
     end
-  end
-
-  describe "#default_opts" do
-    it { expect( obj.default_opts).to eq ({:threaded => false, :timeout  => 60}) }
-  end
-
-  describe "#hsdq_opts" do
-    it { expect( obj.hsdq_opts({:threaded=>true})).to eq ({:threaded => true, :timeout  => 60}) }
   end
 
 end

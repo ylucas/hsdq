@@ -1,4 +1,4 @@
-require_relative '../../shared/hdsq_shared_setup'
+require_relative '../../shared/hsdq_shared_setup'
 
 RSpec.describe Hsdq::Sender do
   include_context "setup_shared"

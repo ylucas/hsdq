@@ -4,9 +4,9 @@ require 'json'
 
 require_relative '../spec_helper'
 
-class TestClient
+class HsdqTestClient
   include Hsdq
-  def self.name; 'TestClient'; end
+  # def self.name; 'HsdqTestClient'; end
 
     # run the loop only one time for testing pupose
   def hsdq_start_one(channel, options={})
@@ -18,7 +18,8 @@ class TestClient
 end
 
 RSpec.shared_context 'setup_shared' do
-  let(:obj) { TestClient.new }
+  let(:obj) { HsdqTestClient.new }
+  # let(:dum_klass) { class HsdqDummyKlass; extend Hsdq; end }
 
   def test_options
     {

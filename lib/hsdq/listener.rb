@@ -34,18 +34,6 @@ module Hsdq
       p "do something here #{message}"
     end
 
-    def hsdq_opts(opts={})
-      # todo here read from yml file
-      @hsdqopts ||= default_opts.merge opts
-    end
-
-    def default_opts
-      @default_opts ||= {
-        :threaded => false,
-        :timeout  => 60
-      }
-    end
-
     private
       # Listening loop
       def hsdq_loop(channel)
