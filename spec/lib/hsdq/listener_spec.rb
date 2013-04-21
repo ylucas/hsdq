@@ -18,7 +18,7 @@ RSpec.describe Hsdq::Listener do
   end
 
   describe "read from channel" do
-    before { Redis.new.flushall }
+    before { Redis.new.flushdb }
 
     it "listen to a channel" do
       expect(obj).to receive(:hsdq_task).exactly(1).times

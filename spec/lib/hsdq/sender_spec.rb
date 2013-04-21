@@ -12,7 +12,7 @@ RSpec.describe Hsdq::Sender do
   end
 
   describe "#send_message" do
-    before { Redis.new.flushall }
+    before { Redis.new.flushdb }
 
     let!(:msg)   { basic_message_h }
     let!(:spark) { obj.build_spark(msg) }
