@@ -6,6 +6,26 @@ module Hsdq
   module Sender
     include Connectors
 
+    def hsdq_send_request(message_h)
+      hsdq_send(message_h.merge(:type => :request))
+    end
+
+    def hsdq_send_ack(message_h)
+      hsdq_send(message_h.merge(:type => :ack))
+    end
+
+    def hsdq_send_callback(message_h)
+      hsdq_send(message_h.merge(:type => :callback))
+    end
+
+    def hsdq_send_feedback(message_h)
+      hsdq_send(message_h.merge(:type => :feedback))
+    end
+
+    def hsdq_send_error(message_h)
+      hsdq_send(message_h.merge(:type => :error))
+    end
+
     def hsdq_send(message_h)
       message_h = prepare_message message_h
       if validate_keys? message_h && valid_type?(message_h[:type])
