@@ -8,8 +8,12 @@ module Hsdq
 
     def hsdq_send(message_h)
       message_h = prepare_message message_h
-      #validate_keys? message_h
-      spark = build_spark(message_h)
+      if validate_keys? message_h && valid_type?(message_h[:type])
+        spark = build_spark(message_h)
+        send_message message_h, spark
+      else
+        false
+      end
     end
 
     def send_message(message_h, spark)
@@ -46,5 +50,14 @@ module Hsdq
       spark[:spark_uid] = "#{SecureRandom.uuid}"
       spark.to_json
     end
+
+    def valid_keys?(message_h)
+      [:sender, :sent_to, :type, :uid] - message_h.keys == []
+    end
+
+    def valid_type?(type)
+      [:request, :ack, :callback, :feedback, :error].include? type
+    end
+
   end
 end

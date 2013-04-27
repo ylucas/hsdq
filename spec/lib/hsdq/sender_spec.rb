@@ -38,12 +38,44 @@ RSpec.describe Hsdq::Sender do
 
     it { expect(obj.prepare_message(msg)[:tstamp]).to be_an_instance_of Time }
     it { expect(obj.prepare_message(msg)[:sender]).to be_an_instance_of String }
-    it { expect(obj.prepare_message(msg)[:uid]).to be_an_instance_of String }
+    it { expect(obj.prepare_message(msg)[:uid]).to    be_an_instance_of String }
+  end
+
+  describe "#valid_keys?" do
+    let(:msg) { basic_message_h.merge :spark_uid => "abcdef" }
+
+    it { expect(obj.valid_keys? msg).to be true }
+    [:sender, :sent_to, :type, :uid].each do |k|
+      specify "key #{k} must be present" do
+        msg.delete k
+        expect(obj.valid_keys? msg).not_to be true
+      end
+    end
+  end
+
+  describe "#valide_type?" do
+    [:request, :ack, :callback, :feedback, :error].each do |type|
+      it { expect(obj.valid_type?(type)).to be true }
+    end
+    it { expect(obj.valid_type?(:whatever)).to be false }
   end
 
   def basic_message_h
     {
       :sender => 'my_app',
+      :sent_to => 'my-channel',
+      :uid    => '12345',
+      :type   => 'request',
+      # :tstamp => nil,
+      :tipc   => 'dishes',
+      :task   => 'clean',
+      :params => {:whatever => 'good', :cheese => 'smelly'}
+    }
+  end
+
+  def bad_message_h
+    {
+      # :sender => 'my_app',
       :sent_to => 'my-channel',
       :uid    => '12345',
       :type   => 'request',
