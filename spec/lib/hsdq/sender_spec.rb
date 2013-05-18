@@ -62,14 +62,13 @@ RSpec.describe Hsdq::Sender do
 
   def basic_message_h
     {
-      :sender => 'my_app',
+      :sender  => 'my_app',
       :sent_to => 'my-channel',
-      :uid    => '12345',
-      :type   => 'request',
-      # :tstamp => nil,
-      :tipc   => 'dishes',
-      :task   => 'clean',
-      :params => {:whatever => 'good', :cheese => 'smelly'}
+      :uid     => '12345',
+      :type    => 'request',
+      :topic   => 'dishes',
+      :task    => 'clean',
+      :params  => {:whatever => 'good', :cheese => 'smelly'}
     }
   end
 
@@ -77,12 +76,11 @@ RSpec.describe Hsdq::Sender do
     {
       # :sender => 'my_app',
       :sent_to => 'my-channel',
-      :uid    => '12345',
-      :type   => 'request',
-      # :tstamp => nil,
-      :tipc   => 'dishes',
-      :task   => 'clean',
-      :params => {:whatever => 'good', :cheese => 'smelly'}
+      :uid     => '12345',
+      :type    => 'request',
+      :topic   => 'dishes',
+      :task    => 'clean',
+      :params  => {:whatever => 'good', :cheese => 'smelly'}
     }
   end
 

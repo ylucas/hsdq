@@ -60,10 +60,6 @@ module Hsdq
       message_h
     end
 
-    def channel(channel_str=nil)
-      @channel ||= "sample" # todo automatize
-    end
-
     def build_spark(message_h)
       keys = [:sender, :uid, :type, :tstamp, :topic, :task ]
       spark = keys.inject({}) { |memo, param| memo.merge(param => message_h[param]) }
