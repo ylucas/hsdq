@@ -3,7 +3,7 @@
 module Hsdq
   module Setting
     def hsdq_opts(opts={})
-      @hsdqopts ||= read_opts.merge opts
+      @hsdq_opts ||= read_opts.merge opts
     end
 
     def default_opts
