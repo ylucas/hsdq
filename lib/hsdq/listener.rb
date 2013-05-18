@@ -8,7 +8,7 @@ module Hsdq
 
     # Start hsdq to listen to channel. When a message is obtained, hsd_task will be called
     # If threaded is true the hsd_task will run in a thread otherwise it will be blocking
-    def hsdq_start(channel, options={})
+    def hsdq_start(channel, options=hsdq_opts)
       hsdq_opts(options)
       hsdq_run!
       hsdq_loop(channel)
@@ -23,7 +23,7 @@ module Hsdq
     end
 
     def hsdq_running?
-      !!@hsdq_running
+      @hsdq_running
     end
 
     def hsdq_stopped?
