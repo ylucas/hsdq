@@ -30,23 +30,13 @@ module Hsdq
       !@hsdq_running
     end
 
-    def hsdq_task(message)
-      p "do something here #{message}"
-    end
-
     private
       # Listening loop
       def hsdq_loop(channel)
         p "listening started"
         loop  do
-          message = cx_listener.blpop(channel, hsdq_opts[:timeout] )
-          if hsdq_opts[:threaded]
-            Thread.new do
-              hsdq_task(message)
-            end
-          else
-            hsdq_task(message)
-          end
+          spark = cx_listener.blpop(channel, hsdq_opts[:timeout] )
+            hsdq_ignit spark, hsdq_opts
           break if hsdq_stopped?
         end
       end
