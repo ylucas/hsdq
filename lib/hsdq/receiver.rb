@@ -34,6 +34,7 @@ module Hsdq
     # Entry point for the task to process
     def sparkle(spark, options)
       puts spark.inspect
+      send_ack spark
 
     end
 
@@ -60,6 +61,11 @@ module Hsdq
       puts "sending error message: #{error}"
       hsdq_send_error error
       error
+    end
+
+    def send_ack(spark)
+      ack_msg = spark.merge sent_to: spark[:sender], sender: channel
+      hsdq_send_ack ack_msg
     end
 
     def hsdq_authorized_types

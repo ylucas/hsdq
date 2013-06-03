@@ -9,7 +9,8 @@ RSpec.describe Hsdq::Receiver do
   let(:empty_options)     { {} }
   let(:auth_topics)       { [:martini, :food] }
   let(:auth_tasks)        { [:order, :eat, :drink] }
-  # let(:valid_spark)       {}
+  let(:valid_spark) { {topic: :martini, task: :drink, sender: "an_app", uid: "12345", sent_to: "another_app"} }
+
 
   describe "action methods" do
     context "place_holder" do
@@ -56,12 +57,10 @@ RSpec.describe Hsdq::Receiver do
     end
 
     context "valid spark" do
-      let(:valid_spark) { {topic: :martini, task: :drink} }
-
       it { expect(obj.whitelisted?(valid_spark, empty_options)).to be true }
     end
     context "invalid spark" do
-      let(:invalid_spark) { {topic: :martini, task: :whatever, sender: "an_app", uid: "12345", sent_to: "another_app", } }
+      let(:invalid_spark) { {topic: :martini, task: :whatever, sender: "an_app", uid: "12345", sent_to: "another_app" } }
 
       it { expect(obj.whitelisted?(invalid_spark, empty_options)).to be false }
     end
@@ -91,6 +90,17 @@ RSpec.describe Hsdq::Receiver do
     it "call hsdq_send_error" do
       expect(obj).to receive(:hsdq_send_error).with(error_h)
       obj.send :reject_spark, spark, error
+    end
+  end
+
+  describe "#send_ack" do
+    let(:ack_msg) { valid_spark }
+    let(:expected) { valid_spark.merge sent_to: "an_app", sender: obj.channel }
+
+    it "reply to the sender" do
+      expect(obj).to receive(:hsdq_send_ack).with(expected)
+
+      obj.send_ack valid_spark
     end
   end
 
