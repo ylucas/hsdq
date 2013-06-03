@@ -20,9 +20,9 @@ RSpec.describe Hsdq::Listener do
   describe "read from channel" do
     before { Redis.new.flushdb }
 
-    it "listen to a channel" do
-      expect(obj).to receive(:hsdq_task).exactly(1).times
-      Redis.new.rpush("my-channel", "my message")
+    it "get the spark" do
+      expect(obj).to receive(:sparkle).exactly(1).times
+      Redis.new.rpush("my-channel", {message: "my message"}.to_json)
       obj.hsdq_start_one("my-channel", test_options)
     end
   end

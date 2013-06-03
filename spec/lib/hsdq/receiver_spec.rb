@@ -3,7 +3,13 @@ require_relative '../../shared/hsdq_shared_setup'
 RSpec.describe Hsdq::Receiver do
   include_context "setup_shared"
 
-  # let(:valid_spark) {}
+  let(:simple_spark_h)    { {message: "my message"} }
+  let(:simple_spark)      { simple_spark_h.to_json }
+  let(:simple_raw_spark)  { ["a_channel", simple_spark] }
+  let(:empty_options)     { {} }
+  let(:auth_topics)       { [:martini, :food] }
+  let(:auth_tasks)        { [:order, :eat, :drink] }
+  # let(:valid_spark)       {}
 
   describe "action methods" do
     context "place_holder" do
@@ -15,7 +21,7 @@ RSpec.describe Hsdq::Receiver do
 
   describe "#get_spark" do
     context "array" do
-      it { expect(obj.get_spark(['channnel_name', 'my spark'])).to eq 'my spark' }
+      it { expect(obj.get_spark(simple_raw_spark)).to eq simple_spark }
     end
 
     context "json string" do
@@ -30,9 +36,51 @@ RSpec.describe Hsdq::Receiver do
     it { expect(obj.h_spark(['channel_name', json_spark])).to eq spark }
   end
 
+  describe "#check_whitelist" do
+    it "do not raise if whitelisted" do
+      allow(obj).to receive(:whitelisted?) { true }
+
+      expect {obj.check_whitelist(simple_spark, empty_options)}.not_to raise_error
+    end
+    it "raise if not whitelisted" do
+      allow(obj).to receive(:whitelisted?) { false }
+
+      expect {obj.check_whitelist(simple_spark, empty_options)}.to raise_exception
+    end
+  end
+
+  describe "#whitelisted?" do
+    before() do
+      obj.hsdq_authorized_tasks auth_tasks
+      obj.hsdq_authorized_topics auth_topics
+    end
+
+    context "valid spark" do
+      let(:valid_spark) { {topic: :martini, task: :drink} }
+
+      it { expect(obj.whitelisted?(valid_spark, empty_options)).to be true }
+    end
+    context "invalid spark" do
+      let(:invalid_spark) { {topic: :martini, task: :whatever, sender: "an_app", uid: "12345", sent_to: "another_app", } }
+
+      it { expect(obj.whitelisted?(invalid_spark, empty_options)).to be false }
+    end
+  end
+
+    describe "#sparkle" do
+  # todo
+    end
+
+  describe "#reject_spark" do
+    let(:invalid_spark) { {topic: :martini, task: :whatever} }
+    before { allow(obj).to receive(:hsdq_send_error)  { true } }
+
+    it { expect(obj.reject_spark(invalid_spark, ArgumentError.new("Illegal argument"))[:data]).to eq "Illegal argument" }
+  end
+
   describe "handle_spark_rejection" do
     spark = {uid: '12345', sender: 'the_sender'}
-    let(:error_msg) { "you got an error" }
+    let(:error) { ArgumentError.new("you got an error") }
     error_h = {
       sent_to: 'the_sender',
       uid:     '12345',
@@ -42,12 +90,12 @@ RSpec.describe Hsdq::Receiver do
     }
     it "call hsdq_send_error" do
       expect(obj).to receive(:hsdq_send_error).with(error_h)
-      obj.send :handle_spark_rejection, spark, error_msg
+      obj.send :reject_spark, spark, error
     end
   end
 
-  describe "#hsdq_authorized_actions" do
-    it { expect(obj.hsdq_authorized_actions).to eq [:request, :ack, :feedback, :callback, :error] }
+  describe "#hsdq_authorized_types" do
+    it { expect(obj.hsdq_authorized_types).to eq [:request, :ack, :feedback, :callback, :error] }
   end
 
   describe "hsdq_authorized_tasks" do

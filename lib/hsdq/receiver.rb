@@ -4,25 +4,21 @@ module Hsdq
   module Receiver
 
     # Placeholder methods for the message types
-    def hsdq_task(message_h, _context_h);  placeholder; end
+    def hsdq_task(message_h, _context_h);    placeholder; end
     def hsdq_ack(message_h, context_h);      placeholder; end
     def hsdq_callback(message_h, context_h); placeholder; end
     def hsdq_feedback(message_h, context_h); placeholder; end
     def hsdq_error(message_h, context_h);    placeholder; end
 
-    def hsdq_ignit(raw_spark)
-      spark = do_spark_h raw_spark
-      if whitelisted? spark
-        if hsdq_opts[:threaded]
-          Thread.new do
-            process_spark spark
-          end
-        else
-          process_spark spark
+    def hsdq_ignit(raw_spark, options)
+      spark = h_spark raw_spark
+      check_whitelist spark, options
+      if hsdq_opts[:threaded]
+        Thread.new do
+          sparkle spark, options
         end
       else
-        error_message = "Rejected"
-        handle_spark_rejection spark, error_message
+        sparkle spark, options
       end
     end
 
@@ -35,39 +31,48 @@ module Hsdq
       JSON.parse get_spark(raw_spark), {symbolize_names: true}
     end
 
-    def whitelisted?(spark)
-      true # TODO
+    # Entry point for the task to process
+    def sparkle(spark, options)
+      puts spark.inspect
+
     end
 
-    def handle_spark_rejection(spark, error_message)
+    def check_whitelist(spark, options)
+      begin
+        raise ArgumentError.new("Illegal argument") unless whitelisted? spark, options
+      rescue => e
+        reject_spark spark, e
+      end
+    end
+
+    def whitelisted?(spark, options)
+      hsdq_authorized_topics.include?(spark[:topic]) && hsdq_authorized_tasks.include?(spark[:task])
+    end
+
+    def reject_spark(spark, e)
       error = {
         sent_to: spark[:sender],
         uid:     spark[:uid],
         sender:  channel,
         params:  spark,
-        data:    error_message
+        data:    e.message
       }
       puts "sending error message: #{error}"
       hsdq_send_error error
+      error
     end
 
-    # Entry point for the task to process
-    def process_spark(spark)
-
-    end
-
-    def hsdq_authorized_actions
+    def hsdq_authorized_types
       [:request, :ack, :feedback, :callback, :error]
     end
 
     def hsdq_authorized_tasks(*tasks)
-      @hsdq_authorized_tasks ||= [hsdq_opts[:tasks] + tasks].flatten
+      @hsdq_authorized_tasks ||= [hsdq_opts[:tasks], [tasks]].flatten
     end
 
     def hsdq_authorized_topics(*topics)
-      @hsdq_authorized_topics ||= [hsdq_opts[:topics] + topics].flatten
+      @hsdq_authorized_topics ||= [hsdq_opts[:topics], [topics]].flatten
     end
-
 
   end
 end
