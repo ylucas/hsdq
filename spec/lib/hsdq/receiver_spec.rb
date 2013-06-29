@@ -9,7 +9,12 @@ RSpec.describe Hsdq::Receiver do
   let(:empty_options)     { {} }
   let(:auth_topics)       { [:martini, :food] }
   let(:auth_tasks)        { [:order, :eat, :drink] }
-  let(:valid_spark) { {topic: :martini, task: :drink, sender: "an_app", uid: "12345", sent_to: "another_app"} }
+  let(:valid_spark) { {type: "request",
+                       topic: :martini,
+                       task: :drink,
+                       sender: "an_app",
+                       uid: "12345",
+                       sent_to: "another_app"} }
 
 
   describe "action methods" do
@@ -97,10 +102,23 @@ RSpec.describe Hsdq::Receiver do
     let(:ack_msg) { valid_spark }
     let(:expected) { valid_spark.merge sent_to: "an_app", sender: obj.channel }
 
-    it "reply to the sender" do
-      expect(obj).to receive(:hsdq_send_ack).with(expected)
+    context "request" do
+      it "reply to the sender" do
+        expect(obj).to receive(:hsdq_send_ack).with(expected)
 
-      obj.send_ack valid_spark
+        obj.send_ack valid_spark
+      end
+    end
+    context "Not a request" do
+      let(:response_spark) { valid_spark.merge(type: "feedback") }
+
+      it "reply to the sender" do
+        expect(obj).not_to receive(:hsdq_send_ack).with(expected)
+
+        obj.send_ack response_spark
+      end
+
+      it { expect(obj.send_ack response_spark).to be nil }
     end
   end
 

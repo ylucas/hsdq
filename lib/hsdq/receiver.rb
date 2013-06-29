@@ -64,6 +64,7 @@ module Hsdq
     end
 
     def send_ack(spark)
+      return unless 'request' == spark[:type]
       ack_msg = spark.merge sent_to: spark[:sender], sender: channel
       hsdq_send_ack ack_msg
     end
