@@ -30,6 +30,10 @@ module Hsdq
       !@hsdq_running
     end
 
+    def start_listener
+      Thread.new { hsdq_start(channel, {:threaded => true}) }
+    end
+
     private
       # Listening loop
       def hsdq_loop(channel)
@@ -40,10 +44,6 @@ module Hsdq
           break if hsdq_stopped?
         end
       end
-
-    def start_listener
-      Thread.new { hsdq_start(channel, {:threaded => true}) }
-    end
 
   end
 end
