@@ -28,9 +28,10 @@ module Hsdq
 
     def hsdq_send(message_h)
       message_h = prepare_message message_h
-      if validate_keys? message_h && valid_type?(message_h[:type])
+      if valid_keys?(message_h) && valid_type?(message_h[:type])
         spark = build_spark(message_h)
-        send_message message_h, spark
+        message_h[:spark_uid] = spark[:spark_uid]
+        send_message message_h, spark.to_json
       else
         false
       end
@@ -53,7 +54,7 @@ module Hsdq
     def prepare_message(message_h)
       message_h[:sender]   = channel
       # todo get the uid from the process in case of response
-      message_h[:uid]    ||= SecureRandom.uui
+      message_h[:uid]    ||= SecureRandom.uuid
       message_h[:tstamp]   = Time.now.utc
       # todo set sent_to from the process in case of response
       message_h[:sent_to] = "wip_fixme" unless 'request' == message_h[:type]
@@ -64,7 +65,7 @@ module Hsdq
       keys = [:sender, :uid, :type, :tstamp, :topic, :task ]
       spark = keys.inject({}) { |memo, param| memo.merge(param => message_h[param]) }
       spark[:spark_uid] = "#{SecureRandom.uuid}"
-      spark.to_json
+      spark
     end
 
     def valid_keys?(message_h)
