@@ -58,7 +58,7 @@ module Hsdq
     end
 
     def whitelisted?(spark, options)
-      hsdq_authorized_topics.include?(spark[:topic]) && hsdq_authorized_tasks.include?(spark[:task])
+      valid_topic?(spark, options) && valid_task?(spark, options)
     end
 
     def reject_spark(spark, e)
@@ -90,6 +90,16 @@ module Hsdq
 
     def hsdq_authorized_topics(*topics)
       @hsdq_authorized_topics ||= [hsdq_opts[:topics], [topics]].flatten
+    end
+
+    def valid_task?(spark, _options)
+      return true unless spark[:task] # nil values ok by default add option to reject nil
+      hsdq_authorized_tasks.include?(spark[:task].to_sym)
+    end
+
+    def valid_topic?(spark, _options)
+      return true unless spark[:topic] # nil values ok by default add option to reject nil
+      hsdq_authorized_topics.include?(spark[:topic].to_sym)
     end
 
   end

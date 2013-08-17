@@ -7,23 +7,23 @@ module Hsdq
     include Connectors
 
     def hsdq_send_request(message_h)
-      hsdq_send(message_h.merge(type: 'request'))
+      hsdq_send(message_h.merge(type: :request))
     end
 
     def hsdq_send_ack(message_h)
-      hsdq_send(message_h.merge(type: 'ack'))
+      hsdq_send(message_h.merge(type: :ack))
     end
 
     def hsdq_send_callback(message_h)
-      hsdq_send(message_h.merge(type: 'callback'))
+      hsdq_send(message_h.merge(type: :callback))
     end
 
     def hsdq_send_feedback(message_h)
-      hsdq_send(message_h.merge(type: 'feedback'))
+      hsdq_send(message_h.merge(type: :feedback))
     end
 
     def hsdq_send_error(message_h)
-      hsdq_send(message_h.merge(type: 'error'))
+      hsdq_send(message_h.merge(type: :error))
     end
 
     def hsdq_send(message_h)

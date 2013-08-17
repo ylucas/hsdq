@@ -7,7 +7,7 @@ module Hsdq
     end
 
     def valid_type?(type)
-      %w(request ack callback feedback error).include? type
+      [:request, :ack, :callback, :feedback, :error].include? type.to_sym
     end
 
   end
