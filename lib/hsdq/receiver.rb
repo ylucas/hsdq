@@ -12,6 +12,7 @@ module Hsdq
 
     def hsdq_ignit(raw_spark, options)
       spark = h_spark raw_spark
+      send_ack spark
       check_whitelist spark, options
       if hsdq_opts[:threaded]
         Thread.new do
@@ -34,7 +35,7 @@ module Hsdq
     # Entry point for the task to process
     def sparkle(spark, options)
       puts spark.inspect
-      send_ack spark
+
 
     end
 
