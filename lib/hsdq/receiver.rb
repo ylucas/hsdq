@@ -13,7 +13,7 @@ module Hsdq
     def hsdq_ignit(raw_spark, options)
       spark = h_spark raw_spark
       send_ack spark
-      check_whitelist spark, options
+      validate_spark spark, options
       if hsdq_opts[:threaded]
         Thread.new do
           sparkle spark, options
@@ -35,13 +35,23 @@ module Hsdq
     # Entry point for the task to process
     def sparkle(spark, options)
       puts spark.inspect
+      # TODO WIP ++++++
 
+    end
+
+    def validate_spark(spark, options)
+      begin
+        raise ArgumentError.new("Illegal type #{spark[:type]}") unless valid_type? spark[:type]
+        check_whitelist spark, options if 'request' == spark[:type]
+      rescue => e
+        reject_spark spark, e
+      end
 
     end
 
     def check_whitelist(spark, options)
       begin
-        raise ArgumentError.new("Illegal argument") unless whitelisted? spark, options
+        raise ArgumentError.new("Illegal argument in topic or task") unless whitelisted? spark, options
       rescue => e
         reject_spark spark, e
       end

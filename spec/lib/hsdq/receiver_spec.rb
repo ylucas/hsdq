@@ -42,6 +42,21 @@ RSpec.describe Hsdq::Receiver do
     it { expect(obj.h_spark(['channel_name', json_spark])).to eq spark }
   end
 
+  describe "#validate_spark" do
+    before { allow(obj).to receive(:check_whitelist) { true } }
+
+    it "do not raise if type is valid" do
+      allow(obj).to receive(:whitelisted?) { true }
+
+      expect {obj.validate_spark(valid_spark, empty_options)}.not_to raise_error
+    end
+    it "raise if type is not valid" do
+      allow(obj).to receive(:valid_type?) { false }
+
+      expect {obj.validate_spark(simple_spark, empty_options)}.to raise_exception
+    end
+  end
+
   describe "#check_whitelist" do
     it "do not raise if whitelisted" do
       allow(obj).to receive(:whitelisted?) { true }
