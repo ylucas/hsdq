@@ -9,7 +9,7 @@ module Hsdq
     def default_opts
       @default_opts ||= {
         :threaded => false,
-        :timeout  => 60
+        :timeout  => 10
       }
     end
 
