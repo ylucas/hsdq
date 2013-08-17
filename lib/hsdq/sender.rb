@@ -57,7 +57,7 @@ module Hsdq
       message_h[:uid]    ||= SecureRandom.uuid
       message_h[:tstamp]   = Time.now.utc
       # todo set sent_to from the process in case of response
-      message_h[:sent_to] = "wip_fixme" unless 'request' == message_h[:type]
+      # message_h[:sent_to] = "wip_fixme" unless :request == message_h[:type]
       message_h
     end
 
