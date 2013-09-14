@@ -10,5 +10,9 @@ module Hsdq
       [:request, :ack, :callback, :feedback, :error].include? type.to_sym
     end
 
+    def hsdq_key(message_or_spark)
+      "hsdq_#{message_or_spark[:uid]}_h"
+    end
+
   end
 end

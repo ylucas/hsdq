@@ -10,4 +10,8 @@ RSpec.describe Hsdq::Shared do
     it { expect(obj.valid_type?(:whatever)).to be false }
   end
 
+  describe "#hsdq_key" do
+    it { expect(obj.hsdq_key({uid: "12345", whatever: "nothing"})).to eq "hsdq_12345_h" }
+  end
+
 end
