@@ -7,10 +7,8 @@ RSpec.describe Hsdq::Connectors do
     it { expect(obj.cx_listener).to be_an_instance_of Redis }
   end
 
-  describe "#cx_sender connection" do
-    it { expect(obj.cx_listener).to be_an_instance_of Redis }
+  describe "#cx_data connection" do
+    it { expect(obj.cx_data).to be_an_instance_of Redis }
   end
-
-
 
 end

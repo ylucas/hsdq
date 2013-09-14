@@ -2,14 +2,15 @@ require 'redis'
 
 module Hsdq
   module Connectors
-    # establish listener connection
+    # establish listener connection,
+    # IMPORTANT this connection is blocked by the listener and must not be used elsewhere
     def cx_listener
       @cx_listener ||= Redis.new
     end
 
-    # establish sender connection
-    def cx_sender
-      @cx_sender ||= Redis.new
+    # establish an unblocked connection for the sender and also pulling data from Redis
+    def cx_data
+      @cx_data ||= Redis.new
     end
   end
 end

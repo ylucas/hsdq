@@ -40,7 +40,7 @@ module Hsdq
         p "listening started"
         loop  do
           raw_spark = cx_listener.blpop(channel, hsdq_opts[:timeout] )
-            hsdq_ignit raw_spark, hsdq_opts
+          hsdq_ignit raw_spark, hsdq_opts if raw_spark
           break if hsdq_stopped?
         end
       end

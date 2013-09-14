@@ -40,10 +40,10 @@ module Hsdq
     def send_message(message_h, spark)
       channel_name = message_h[:sent_to]
       h_key        = "#{message_h[:uid]}_h"
-      cx_sender.multi do
-        cx_sender.hset   h_key,   message_key(message_h), message_h.to_json
-        cx_sender.expire h_key,   259200 #3 days
-        cx_sender.rpush  channel_name, spark
+      cx_data.multi do
+        cx_data.hset   h_key,   message_key(message_h), message_h.to_json
+        cx_data.expire h_key,   259200 #3 days
+        cx_data.rpush  channel_name, spark
       end
     end
 

@@ -12,7 +12,7 @@ RSpec.describe Hsdq::Sender do
   end
 
   describe "#send_message" do
-    before { obj.cx_sender.flushdb }
+    before { obj.cx_data.flushdb }
 
     let!(:msg)   { basic_message_w_uid }
     let!(:spark) { obj.build_spark(msg) }
@@ -35,21 +35,21 @@ RSpec.describe Hsdq::Sender do
     let!(:channel_name) { msg[:sent_to] }
 
     before do
-      obj.cx_sender.flushdb
+      obj.cx_data.flushdb
       obj.send_message msg, spark_json
     end
 
     it "create a list if none exist" do
-      expect(obj.cx_sender.keys).to include channel_name
+      expect(obj.cx_data.keys).to include channel_name
     end
     it "write the spark in the channel list" do
-      expect(obj.cx_sender.lpop channel_name).to eq spark_json
+      expect(obj.cx_data.lpop channel_name).to eq spark_json
     end
     it "create a Redis hash based the message uid" do
-      expect(obj.cx_sender.keys).to include hkey
+      expect(obj.cx_data.keys).to include hkey
     end
     it "write the redis hash" do
-      expect(JSON.parse((obj.cx_sender.hget hkey, "request_#{spark[:spark_uid]}"), symbolize_names: true)).to eq msg
+      expect(JSON.parse((obj.cx_data.hget hkey, "request_#{spark[:spark_uid]}"), symbolize_names: true)).to eq msg
     end
   end
 

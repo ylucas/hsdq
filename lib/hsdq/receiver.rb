@@ -39,6 +39,10 @@ module Hsdq
 
     end
 
+    def get_burst
+
+    end
+
     def validate_spark(spark, options)
       begin
         raise ArgumentError.new("Illegal type #{spark[:type]}") unless valid_type? spark[:type]
