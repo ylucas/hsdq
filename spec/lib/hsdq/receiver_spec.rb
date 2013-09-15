@@ -9,12 +9,13 @@ RSpec.describe Hsdq::Receiver do
   let(:empty_options)     { {} }
   let(:auth_topics)       { [:martini, :food] }
   let(:auth_tasks)        { [:order, :eat, :drink] }
-  let(:valid_spark) { {type: "request",
-                       topic: :martini,
-                       task: :drink,
-                       sender: "an_app",
-                       uid: "12345",
-                       sent_to: "another_app"} }
+  let(:valid_spark) { {type:      :request,
+                       topic:     :martini,
+                       task:      :drink,
+                       sender:    "an_app",
+                       uid:       "12345",
+                       spark_uid: "qwerty",
+                       sent_to:   "another_app"} }
 
 
   describe "action methods" do

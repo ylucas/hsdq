@@ -4,7 +4,7 @@ RSpec.describe Hsdq::Sender do
   include_context "setup_shared"
 
   describe "#build_spark" do
-    let!(:spark) { obj.build_spark(basic_message_h) }
+    let!(:spark) { obj.build_spark(basic_message) }
 
     it { expect(spark[:sender]).to eq 'my_app' }
     it { expect(spark[:spark_uid]).to be_an_instance_of String }
@@ -54,13 +54,13 @@ RSpec.describe Hsdq::Sender do
   end
 
   describe "#message_key" do
-    let(:msg) { basic_message_h.merge :spark_uid => "abcdef" }
+    let(:msg) { basic_message.merge :spark_uid => "abcdef" }
 
     it { expect(obj.message_key msg).to eq "request_abcdef" }
   end
 
   describe "#prepare_message" do
-    let(:msg) { basic_message_h }
+    let(:msg) { basic_message }
 
     it { expect(obj.prepare_message(msg)[:tstamp]).to be_an_instance_of Time }
     it { expect(obj.prepare_message(msg)[:sender]).to be_an_instance_of String }
@@ -68,7 +68,7 @@ RSpec.describe Hsdq::Sender do
   end
 
   describe "#valid_keys?" do
-    let(:msg) { basic_message_h.merge :uid => "abcdef" }
+    let(:msg) { basic_message.merge :uid => "abcdef" }
 
     it { expect(obj.valid_keys? msg).to be true }
     [:sender, :sent_to, :type, :uid].each do |k|
@@ -79,7 +79,7 @@ RSpec.describe Hsdq::Sender do
     end
   end
 
-  def basic_message_h
+  def basic_message
     {
       :sender  => 'my_app',
       :sent_to => 'my-channel',
@@ -92,10 +92,10 @@ RSpec.describe Hsdq::Sender do
   end
 
   def basic_message_w_uid
-    basic_message_h.merge uid: '12345'
+    basic_message.merge uid: '12345'
   end
 
-  def bad_message_h
+  def bad_message
     {
       # :sender => 'my_app',
       :sent_to => 'my-channel',

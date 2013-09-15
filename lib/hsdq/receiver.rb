@@ -4,11 +4,11 @@ module Hsdq
   module Receiver
 
     # Placeholder methods for the message types
-    def hsdq_task(message_h, _context_h);    placeholder; end
-    def hsdq_ack(message_h, context_h);      placeholder; end
-    def hsdq_callback(message_h, context_h); placeholder; end
-    def hsdq_feedback(message_h, context_h); placeholder; end
-    def hsdq_error(message_h, context_h);    placeholder; end
+    def hsdq_task(message, _context);    placeholder; end
+    def hsdq_ack(message, context);      placeholder; end
+    def hsdq_callback(message, context); placeholder; end
+    def hsdq_feedback(message, context); placeholder; end
+    def hsdq_error(message, context);    placeholder; end
 
     def hsdq_ignit(raw_spark, options)
       spark = h_spark raw_spark
@@ -35,12 +35,15 @@ module Hsdq
     # Entry point for the task to process
     def sparkle(spark, options)
       puts spark.inspect
+      burst = get_burst spark
+      debugger
+      ttt = 1
       # TODO WIP ++++++
 
     end
 
-    def get_burst
-
+    def get_burst(spark)
+      cx_data.hget hsdq_key(spark), burst_key(spark)
     end
 
     def validate_spark(spark, options)
@@ -79,7 +82,7 @@ module Hsdq
     end
 
     def send_ack(spark)
-      return unless 'request' == spark[:type]
+      return unless ['request', :request].include? spark[:type]
       ack_msg = spark.merge sent_to: spark[:sender], sender: channel
       hsdq_send_ack ack_msg
     end
