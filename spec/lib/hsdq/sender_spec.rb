@@ -28,10 +28,10 @@ RSpec.describe Hsdq::Sender do
   end
 
   describe "#hsdq_send" do
-    let!(:spark)      { obj.build_spark(basic_message_w_uid) }
-    let!(:spark_json)        { spark.to_json }
+    let!(:spark)        { obj.build_spark(basic_message_w_uid) }
+    let!(:spark_json)   { spark.to_json }
     let!(:msg)          { basic_message_w_uid.merge(spark_uid: spark[:spark_uid]) }
-    let!(:hkey)         { "hsdq_#{msg[:uid]}_h" }
+    let!(:hkey)         { "hsdq_h_#{msg[:uid]}" }
     let!(:channel_name) { msg[:sent_to] }
 
     before do
