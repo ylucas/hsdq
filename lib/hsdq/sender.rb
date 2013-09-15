@@ -51,13 +51,19 @@ module Hsdq
       "#{message[:type]}_#{message[:spark_uid]}"
     end
 
+    # todo improve, this is kind of hacky
     def prepare_message(message)
-      message[:sender]   = channel
-      # todo get the uid from the process in case of response
-      message[:uid]    ||= SecureRandom.uuid
-      message[:tstamp]   = Time.now.utc
-      # todo set sent_to from the process in case of response
-      # message[:sent_to] = "wip_fixme" unless :request == message[:type]
+      context = Thread.current[:context]
+      message[:sender]    = channel
+      message[:uid]     ||= (context[:uid] if context) || SecureRandom.uuid
+      message[:tstamp]    = Time.now.utc
+      message[:sent_to] ||=  (context[:sender] if context) #unless  #:request == message[:type]
+      message
+    end
+
+    def set_sent_to(message)
+      return if :request == mesage[:type]
+      message[:sent_to] = message[:sender]
       message
     end
 

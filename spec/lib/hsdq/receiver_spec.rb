@@ -15,7 +15,18 @@ RSpec.describe Hsdq::Receiver do
                        sender:    "an_app",
                        uid:       "12345",
                        spark_uid: "qwerty",
-                       sent_to:   "another_app"} }
+                       sent_to:   "another_app"
+                    } }
+  let(:valid_msg)   { {type:      :request,
+                       topic:     :martini,
+                       task:      :drink,
+                       sender:    "an_app",
+                       uid:       "12345",
+                       spark_uid: "qwerty",
+                       sent_to:   "another_app",
+                       params:    {whatever: "is_good"},
+                       data:      {}
+                    } }
 
 
   describe "action methods" do
@@ -41,6 +52,14 @@ RSpec.describe Hsdq::Receiver do
     let(:json_spark) { spark.to_json }
 
     it { expect(obj.h_spark(['channel_name', json_spark])).to eq spark }
+  end
+
+  describe "#get_burst" do
+    before do
+      obj.cx_data.hset obj.hsdq_key(valid_spark), obj.burst_key(valid_spark), valid_msg.to_json
+    end
+
+    it { expect(obj.get_burst(valid_spark)[:params]).to eq valid_msg[:params] }
   end
 
   describe "#validate_spark" do

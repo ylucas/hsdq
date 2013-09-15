@@ -4,7 +4,7 @@ module Hsdq
   module Receiver
 
     # Placeholder methods for the message types
-    def hsdq_task(message, _context);    placeholder; end
+    def hsdq_request(message, context);  placeholder; end
     def hsdq_ack(message, context);      placeholder; end
     def hsdq_callback(message, context); placeholder; end
     def hsdq_feedback(message, context); placeholder; end
@@ -35,15 +35,27 @@ module Hsdq
     # Entry point for the task to process
     def sparkle(spark, options)
       puts spark.inspect
-      burst = get_burst spark
-      debugger
-      ttt = 1
-      # TODO WIP ++++++
+      burst = get_burst spark, options
+      context = spark
+      Thread.current[:context] = context
+      case spark[:type].to_sym
+        when :ack
+          hsdq_ack burst, context
+        when :callback
+          hsdq_callback burst, context
+        when :feedback
+          hsdq_feedback burst, context
+        when :error
+          hsdq_error burst, context
+        when :request
+          hsdq_request burst, context
+      end
 
     end
 
-    def get_burst(spark)
-      cx_data.hget hsdq_key(spark), burst_key(spark)
+    def get_burst(spark, _options)
+      burst_json = cx_data.hget hsdq_key(spark), burst_key(spark)
+      JSON.parse burst_json, {symbolize_names: true} if burst_json
     end
 
     def validate_spark(spark, options)
