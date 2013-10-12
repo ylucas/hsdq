@@ -1,6 +1,7 @@
 
 module Hsdq
+  VERSION = "0.3.0"
   def hsdq_version
-    "0.2.1"
+    VERSION
   end
 end
