@@ -36,8 +36,7 @@ module Hsdq
     def sparkle(spark, options)
       puts spark.inspect
       burst = get_burst spark, options
-      context = spark
-      Thread.current[:context] = context
+      context spark
       case spark[:type].to_sym
         when :ack
           hsdq_ack burst, context
