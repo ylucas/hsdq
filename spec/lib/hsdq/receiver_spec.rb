@@ -31,7 +31,7 @@ RSpec.describe Hsdq::Receiver do
 
   describe "action methods" do
     context "place_holder" do
-      %w(hsdq_task hsdq_ack hsdq_callback hsdq_feedback hsdq_error).each do |message_type|
+      %w(hsdq_request hsdq_ack hsdq_callback hsdq_feedback hsdq_error).each do |message_type|
         it { expect(obj.send message_type, "whatever", "whoever").to eq obj.placeholder }
       end
     end

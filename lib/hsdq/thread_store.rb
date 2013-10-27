@@ -5,6 +5,10 @@ module Hsdq
       set_get __method__, data
     end
 
+    def context_params(data=nil)
+      set_get __method__, data
+    end
+
     def current_uid(data=nil)
       set_get __method__, data
     end
@@ -13,11 +17,11 @@ module Hsdq
       set_get __method__, data
     end
 
-    def context_burst(data=nil)
+    def sent_to(data=nil)
       set_get __method__, data
     end
 
-    def sent_to(data=nil)
+    def reply_to(data=nil)
       set_get __method__, data
     end
 

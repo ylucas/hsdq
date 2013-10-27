@@ -30,47 +30,54 @@ module Hsdq
       message = prepare_message message
       if valid_keys?(message) && valid_type?(message[:type])
         spark = build_spark(message)
-        message[:spark_uid] = spark[:spark_uid]
-        send_message message, spark.to_json
+        send_message message, spark
       else
         false
       end
     end
 
     def send_message(message, spark)
+      # avoid further processing into the multi redis command
       channel_name = message[:sent_to]
       h_key        = hsdq_key message
+      burst_j      = message.to_json
+      spark_j      = spark.to_json
+      bkey         = burst_key(message)
+
       cx_data.multi do
-        cx_data.hset   h_key,   message_key(message), message.to_json
-        cx_data.expire h_key,   259200 #3 days
-        cx_data.rpush  channel_name, spark
+        cx_data.hset   h_key,   bkey, burst_j
+        cx_data.expire h_key,   259200 #3 days todo set by options
+        cx_data.rpush  channel_name, spark_j
       end
     end
 
-    def message_key(message)
+    def burst_key(message)
       "#{message[:type]}_#{message[:spark_uid]}"
     end
 
-    # todo improve, this is kind of hacky
+    # add the missing parts to the message
     def prepare_message(message)
-      context = Thread.current[:context]
-      message[:sender]    = channel
-      message[:uid]     ||= (context[:uid] if context) || SecureRandom.uuid
-      message[:tstamp]    = Time.now.utc
-      message[:sent_to] ||=  (context[:sender] if context) #unless  #:request == message[:type]
+      message[:sender]           = channel
+      message[:uid]            ||= current_uid || SecureRandom.uuid
+      message[:spark_uid]        = SecureRandom.uuid
+      message[:tstamp]           = Time.now.utc
+      message[:context]          = context_params
+      message[:previous_sender]  = previous_sender
+      message[:sent_to]        ||= sent_to
       message
     end
 
+    # todo rename swap_sent_to
     def set_sent_to(message)
       return if :request == mesage[:type]
       message[:sent_to] = message[:sender]
       message
     end
 
+    # generate the spark from the message (everything in the spark must be into the message as this is ephemeral)
     def build_spark(message)
-      keys = [:sender, :uid, :type, :tstamp, :topic, :task ]
+      keys = [:sender, :uid, :spark_uid, :tstamp, :context, :previous_sender, :type, :topic, :task ]
       spark = keys.inject({}) { |memo, param| memo.merge(param => message[param]) }
-      spark[:spark_uid] = "#{SecureRandom.uuid}"
       spark
     end
 

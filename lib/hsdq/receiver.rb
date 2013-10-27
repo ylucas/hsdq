@@ -35,8 +35,9 @@ module Hsdq
     # Entry point for the task to process
     def sparkle(spark, options)
       puts spark.inspect
-      burst = get_burst spark, options
-      context spark
+      burst, ctx_burst = get_burst spark, options
+      context ctx_burst
+
       case spark[:type].to_sym
         when :ack
           hsdq_ack burst, context
@@ -47,14 +48,52 @@ module Hsdq
         when :error
           hsdq_error burst, context
         when :request
+          set_context spark
+
           hsdq_request burst, context
       end
 
     end
 
-    def get_burst(spark, _options)
-      burst_json = cx_data.hget hsdq_key(spark), burst_key(spark)
-      JSON.parse burst_json, {symbolize_names: true} if burst_json
+    def set_context(spark)
+      # store in thread_store for later use
+      sent_to spark[:sender]
+      previous_sender spark[:sender]
+      context_params({ reply_to: spark[:previous_sender], spark_uid: spark[:spark_uid]})
+    end
+
+    def get_burst(spark, _options={})
+      # get the context parameters
+      context_h = spark[:context]
+
+      burst_p = -> { cx_data.hget hsdq_key(spark), burst_key(spark) }
+      if response?(spark) && context_h
+        # save previous_sender in thread_store for later reply
+        sent_to context_h[:previous_sender]
+        # set the proc for multi redis to pull the initial request
+        burst_context_p = -> { cx_data.hget hsdq_key(spark), "request_#{context_h[:spark_uid]}" }
+        # exec the redis multi
+        burst_j, burst_context_j = pull_burst(burst_p, burst_context_p)
+      else
+        burst_j, burst_context_j = pull_burst_only burst_p
+      end
+
+      burst         = burst_j ? (JSON.parse burst_j, {symbolize_names: true}) : {}
+      burst_context = burst_context_j ? (JSON.parse burst_context_j, {symbolize_names: true}) : {}
+
+      [burst, burst_context]
+    end
+
+    # return an array [burst, context]
+    def pull_burst(burst_p, burst_context_p)
+      cx_data.multi do
+        burst_p.call
+        burst_context_p.call
+      end
+    end
+
+    def pull_burst_only(burst_p)
+      [burst_p.call, nil]
     end
 
     def validate_spark(spark, options)
@@ -118,6 +157,10 @@ module Hsdq
     def valid_topic?(spark, _options)
       return true unless spark[:topic] # nil values ok by default add option to reject nil
       hsdq_authorized_topics.include?(spark[:topic].to_sym)
+    end
+
+    def response?(spark)
+      [:callback, :feedback, :error].include? spark[:type].to_sym
     end
 
   end
