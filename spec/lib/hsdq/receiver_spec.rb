@@ -59,7 +59,7 @@ RSpec.describe Hsdq::Receiver do
       obj.cx_data.hset obj.hsdq_key(valid_spark), obj.burst_key(valid_spark), valid_msg.to_json
     end
 
-    it { expect(obj.get_burst(valid_spark)[:params]).to eq valid_msg[:params] }
+    it { expect(obj.get_burst(valid_spark).first[:params]).to eq valid_msg[:params] }
   end
 
   describe "#validate_spark" do
