@@ -35,7 +35,7 @@ RSpec.describe Hsdq::ThreadStore do
 
   # each proxy method added into thread_store must have a key in the array
   describe "thread.current proxies" do
-    [:context, :current_uid, :previous_sender, :context_burst, :sent_to].each do |key|
+    [:context, :context_params, :current_uid, :previous_sender, :sent_to, :reply_to].each do |key|
       it "receive the values" do
         expect(obj).to receive(:set_get).with(key, context_h)
 
