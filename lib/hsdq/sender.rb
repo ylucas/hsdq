@@ -67,13 +67,6 @@ module Hsdq
       message
     end
 
-    # todo rename swap_sent_to
-    def set_sent_to(message)
-      return if :request == mesage[:type]
-      message[:sent_to] = message[:sender]
-      message
-    end
-
     # generate the spark from the message (everything in the spark must be into the message as this is ephemeral)
     def build_spark(message)
       keys = [:sender, :uid, :spark_uid, :tstamp, :context, :previous_sender, :type, :topic, :task ]
