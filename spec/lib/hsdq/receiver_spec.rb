@@ -37,6 +37,43 @@ RSpec.describe Hsdq::Receiver do
     end
   end
 
+  describe "#hsdq_ignit" do
+    before do
+      allow(obj).to receive(:h_spark) { simple_spark_h }
+      allow(obj).to receive(:send_ack)
+      allow(obj).to receive(:validate_spark)
+      allow(obj).to receive(:sparkle)
+    end
+
+    it "set hash for spark" do
+      expect(obj).to receive(:h_spark).with(simple_spark)
+
+      obj.hsdq_ignit(simple_spark, {whatever: "options"})
+    end
+    it "set hash for spark" do
+      expect(obj).to receive(:send_ack).with(simple_spark_h)
+
+      obj.hsdq_ignit(simple_spark, {whatever: "options"})
+    end
+    it "set hash for spark" do
+      expect(obj).to receive(:validate_spark).with(simple_spark_h, {whatever: "options"})
+
+      obj.hsdq_ignit(simple_spark, {whatever: "options"})
+    end
+    it "start the processing in #sparkle" do
+      expect(obj).to receive(:sparkle).with(simple_spark_h, {whatever: "options"})
+
+      obj.hsdq_ignit(simple_spark, {whatever: "options"})
+    end
+    # unstable test due to the thread
+    # it "start the processing in #sparkle when threaded" do
+    #   expect(obj).to receive(:sparkle).with(simple_spark_h, {whatever: "options"})
+    #
+    #   obj.hsdq_opts[:threaded] = true
+    #   obj.hsdq_ignit(simple_spark, {whatever: "options"})
+    # end
+  end
+
   describe "#get_spark" do
     context "array" do
       it { expect(obj.get_spark(simple_raw_spark)).to eq simple_spark }
@@ -54,12 +91,63 @@ RSpec.describe Hsdq::Receiver do
     it { expect(obj.h_spark(['channel_name', json_spark])).to eq spark }
   end
 
-  describe "#get_burst" do
-    before do
-      obj.cx_data.hset obj.hsdq_key(valid_spark), obj.burst_key(valid_spark), valid_msg.to_json
+  describe "#sparkle" do
+    context "all actions" do
+      %w(ack callback feedback error request).each do |action|
+        it "call the hsdq_#{action}" do
+          spark = {whatever: "message", type: action}
+          allow(obj).to receive(:get_burst) { [spark, {anything: "context"}] }
+
+          expect(obj).to receive("hsdq_#{action}").with(spark, {anything: "context"})
+
+          obj.sparkle spark, {anything: "context"}
+        end
+      end
     end
 
-    it { expect(obj.get_burst(valid_spark).first[:params]).to eq valid_msg[:params] }
+    context "specific for request" do
+      it "set the context" do
+        spark = {whatever: "message", type: "request"}
+        allow(obj).to receive(:get_burst) { [spark, {anything: "context"}] }
+
+        expect(obj).to receive("set_context").with(spark)
+
+        obj.sparkle spark, {anything: "context"}
+
+      end
+    end
+  end
+
+  # IMPORTANT: This test need a running redis instance
+  describe "#get_burst" do
+    context "when a request" do
+      before do
+        obj.cx_data.hset obj.hsdq_key(valid_spark), obj.burst_key(valid_spark), valid_msg.to_json
+      end
+
+      it { expect(obj.get_burst(valid_spark).first[:params]).to eq valid_msg[:params] }
+    end
+
+    context "when a response without context" do
+      let(:spark) { valid_spark.merge(type: 'callback') }
+      before do
+        obj.cx_data.hset obj.hsdq_key(spark), obj.burst_key(spark), valid_msg.to_json
+      end
+
+      it { expect(obj.get_burst(spark).first[:params]).to eq valid_msg[:params] }
+      it { expect(obj.get_burst(spark)[1][:params]).to be nil }
+    end
+
+    context "when a response with context" do
+      let(:spark) { valid_spark.merge(type: 'callback', context: {reply_to: "other_app", spark_uid: "12345" }) }
+      before do
+        obj.cx_data.hset obj.hsdq_key(spark), obj.burst_key(spark), valid_msg.to_json
+        obj.cx_data.hset obj.hsdq_key(spark), "request_12345", {whatever: "abcd", anything: "efgh"}.to_json
+      end
+
+      it { expect(obj.get_burst(spark).first[:params]).to eq valid_msg[:params] }
+      it { expect(obj.get_burst(spark)[1]).to eq ({whatever: "abcd", anything: "efgh"}) }
+    end
   end
 
   describe "#validate_spark" do
@@ -105,10 +193,6 @@ RSpec.describe Hsdq::Receiver do
       it { expect(obj.whitelisted?(invalid_spark, empty_options)).to be false }
     end
   end
-
-    describe "#sparkle" do
-  # todo
-    end
 
   describe "#reject_spark" do
     let(:invalid_spark) { {topic: :martini, task: :whatever} }

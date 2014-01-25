@@ -15,9 +15,11 @@ module Hsdq
       send_ack spark
       validate_spark spark, options
       if hsdq_opts[:threaded]
+        # :nocov:
         Thread.new do
           sparkle spark, options
         end
+        # :nocov:
       else
         sparkle spark, options
       end
