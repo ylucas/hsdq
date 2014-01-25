@@ -27,4 +27,22 @@ RSpec.describe Hsdq::Listener do
     end
   end
 
+  describe "#start_listener" do
+    it "start" do
+      expect(obj).to receive(:hsdq_start)
+
+      obj.start_listener
+    end
+  end
+
+  describe "#hsdq_start" do
+    it "load the options, setup runnning start the loop" do
+      expect(obj).to receive(:hsdq_opts).with({whatever: "options"})
+      expect(obj).to receive(:hsdq_run!)
+      expect(obj).to receive(:hsdq_loop).with("one_channel")
+
+      obj.hsdq_start "one_channel", {whatever: "options"}
+    end
+  end
+
 end
