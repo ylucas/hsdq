@@ -51,10 +51,6 @@ module Hsdq
       end
     end
 
-    def burst_key(message)
-      "#{message[:type]}_#{message[:spark_uid]}"
-    end
-
     # add the missing parts to the message
     def prepare_message(message)
       message[:sender]           = channel
