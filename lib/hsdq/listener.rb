@@ -30,9 +30,11 @@ module Hsdq
       !@hsdq_running
     end
 
+    # :nocov:
     def start_listener
       Thread.new { hsdq_start(channel, {:threaded => true}) }
     end
+    # :nocov:
 
     private
       # Listening loop
