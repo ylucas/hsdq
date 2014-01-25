@@ -28,4 +28,37 @@ RSpec.shared_context 'setup_shared' do
     }
   end
 
+  def basic_message
+    {
+      sender:         'my_app',
+      sent_to:        'my-channel',
+      context:         {reply_to: "other_app", spark_uid: "zxcvb"},
+      previous_sender: 'another_app',
+      type:            'request',
+      topic:           'dishes',
+      task:            'clean',
+      params:          {:whatever => 'good', :cheese => 'smelly'}
+      # -- generated --
+      # uid:            '12345',
+      # spark_uid:      'qwerty',
+      # tstamp:          Time.now.utc,
+    }
+  end
+
+  def basic_message_w_uid
+    basic_message.merge uid: '12345', spark_uid: 'qwerty'
+  end
+
+  def bad_message
+    {
+      # :sender => 'my_app',
+      # type:    'request',
+      sent_to: 'my-channel',
+      uid:     '12345',
+      topic:   'dishes',
+      task:    'clean',
+      params:  {:whatever => 'good', :cheese => 'smelly'}
+    }
+  end
+
 end

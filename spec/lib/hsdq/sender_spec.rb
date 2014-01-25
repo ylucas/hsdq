@@ -44,22 +44,28 @@ RSpec.describe Hsdq::Sender do
     let!(:hkey)         { "hsdq_h_#{msg[:uid]}" }
     let!(:channel_name) { msg[:sent_to] }
 
-    before do
-      obj.cx_data.flushdb
-      obj.send_message msg, spark
+    context "with valid keys and type" do
+      before do
+        obj.send_message msg, spark
+      end
+
+      it "create a list if none exist" do
+        expect(obj.cx_data.keys).to include channel_name
+      end
+      it "write the spark in the channel list" do
+        expect(obj.cx_data.lpop channel_name).to eq spark_json
+      end
+      it "create a Redis hash based the message uid" do
+        expect(obj.cx_data.keys).to include hkey
+      end
+      it "write the redis hash" do
+        expect(JSON.parse((obj.cx_data.hget hkey, "request_#{spark[:spark_uid]}"), symbolize_names: true)).to eq msg
+      end
     end
 
-    it "create a list if none exist" do
-      expect(obj.cx_data.keys).to include channel_name
-    end
-    it "write the spark in the channel list" do
-      expect(obj.cx_data.lpop channel_name).to eq spark_json
-    end
-    it "create a Redis hash based the message uid" do
-      expect(obj.cx_data.keys).to include hkey
-    end
-    it "write the redis hash" do
-      expect(JSON.parse((obj.cx_data.hget hkey, "request_#{spark[:spark_uid]}"), symbolize_names: true)).to eq msg
+    context "with invalid keys or type" do
+      let(:mess) { bad_message }
+      it { expect(obj.hsdq_send mess).to be false }
     end
   end
 
@@ -87,39 +93,6 @@ RSpec.describe Hsdq::Sender do
         expect(obj.valid_keys? msg).not_to be true
       end
     end
-  end
-
-  def basic_message
-    {
-      sender:         'my_app',
-      sent_to:        'my-channel',
-      context:         {reply_to: "other_app", spark_uid: "zxcvb"},
-      previous_sender: 'another_app',
-      type:            'request',
-      topic:           'dishes',
-      task:            'clean',
-      params:          {:whatever => 'good', :cheese => 'smelly'}
-      # -- generated --
-      # uid:            '12345',
-      # spark_uid:      'qwerty',
-      # tstamp:          Time.now.utc,
-    }
-  end
-
-  def basic_message_w_uid
-    basic_message.merge uid: '12345', spark_uid: 'qwerty'
-  end
-
-  def bad_message
-    {
-      # :sender => 'my_app',
-      sent_to: 'my-channel',
-      uid:     '12345',
-      type:    'request',
-      topic:   'dishes',
-      task:    'clean',
-      params:  {:whatever => 'good', :cheese => 'smelly'}
-    }
   end
 
 end
