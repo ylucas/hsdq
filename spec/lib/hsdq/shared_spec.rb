@@ -12,10 +12,15 @@ RSpec.describe Hsdq::Shared do
 
   describe "#hsdq_key" do
     it { expect(obj.hsdq_key({uid: "12345", whatever: "nothing"})).to eq "hsdq_h_12345" }
+    it { expect(obj.hsdq_key({whatever: "nothing"})).to be nil }
+    it { expect(obj.hsdq_key(nil)).to be nil }
   end
 
   describe "#burst_key" do
     it { expect(obj.burst_key({type: :request, spark_uid: '12345'})).to eq "request_12345" }
+    it { expect(obj.burst_key({type: :request})).to be nil }
+    it { expect(obj.burst_key({spark_uid: '12345'})).to be nil }
+    it { expect(obj.burst_key(nil)).to be nil }
   end
 
 end

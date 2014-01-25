@@ -11,11 +11,13 @@ module Hsdq
     end
 
     def hsdq_key(message_or_spark)
-      "hsdq_h_#{message_or_spark[:uid]}"
+      return unless message_or_spark
+      "hsdq_h_#{message_or_spark[:uid]}" if message_or_spark[:uid]
     end
 
     def burst_key(spark)
-      "#{spark[:type]}_#{spark[:spark_uid]}"
+      return unless spark
+      "#{spark[:type]}_#{spark[:spark_uid]}" if spark[:type] && spark[:spark_uid]
     end
 
   end
