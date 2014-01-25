@@ -3,6 +3,16 @@ require_relative '../../shared/hsdq_shared_setup'
 RSpec.describe Hsdq::Sender do
   include_context "setup_shared"
 
+  describe "sender helpers" do
+    %w(request ack callback feedback error).each do |action|
+      it "call hsdq_send with #{action} key" do
+        expect(obj).to receive(:hsdq_send).with({whaterver: "message", type: action.to_sym})
+
+        obj.send "hsdq_send_#{action}", ({whaterver: "message"})
+      end
+    end
+  end
+
   describe "#build_spark" do
     let!(:spark) { obj.build_spark(basic_message_w_uid) }
 
