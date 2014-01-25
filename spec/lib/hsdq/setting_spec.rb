@@ -25,6 +25,11 @@ RSpec.describe Hsdq::Setting do
     it { expect(obj.snakify("MyGoodClass")).to eq 'my_good_class' }
   end
 
+  describe "#channel=" do
+    before { obj.channel = "my_channel" }
+    it { expect(obj.channel).to eq "my_channel" }
+  end
+
   describe "#channel" do
     context "passed param" do
       it { expect(obj.channel('my_channel')).to eq 'my_channel' }
