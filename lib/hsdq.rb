@@ -18,6 +18,7 @@ module Hsdq
   include Setting
   include Receiver
   include ThreadStore
+  include Session
 
   Thread.abort_on_exception = true # Uncomment for debugging
 
