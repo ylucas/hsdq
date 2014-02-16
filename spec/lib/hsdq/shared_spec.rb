@@ -23,4 +23,9 @@ RSpec.describe Hsdq::Shared do
     it { expect(obj.burst_key(nil)).to be nil }
   end
 
+  describe "#session_key" do
+    it { expect(obj.session_key("asdfgh")).to eq "hsdq_s_asdfgh" }
+    it { expect(obj.session_key(nil)).to be nil }
+  end
+
 end

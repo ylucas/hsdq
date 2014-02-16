@@ -20,5 +20,10 @@ module Hsdq
       "#{spark[:type]}_#{spark[:spark_uid]}" if spark[:type] && spark[:spark_uid]
     end
 
+    def session_key(session_id)
+      return unless session_id
+      "hsdq_s_#{session_id}"
+    end
+
   end
 end

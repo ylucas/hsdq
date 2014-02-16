@@ -12,5 +12,10 @@ module Hsdq
     def cx_data
       @cx_data ||= Redis.new
     end
+
+    # establish an unblocked connection for the session layer
+    def cx_session
+      @cx_session ||= Redis.new
+    end
   end
 end

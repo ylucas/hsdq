@@ -8,6 +8,7 @@ require_relative "hsdq/sender"
 require_relative "hsdq/setting"
 require_relative "hsdq/receiver"
 require_relative "hsdq/thread_store"
+require_relative "hsdq/session"
 
 module Hsdq
   include Shared
