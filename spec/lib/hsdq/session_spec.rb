@@ -73,4 +73,13 @@ RSpec.describe Hsdq::Session do
     it { expect(obj.cx_session.ttl obj.session_key(session_id)).to eq 20 }
   end
 
+  describe "#hsdq_session_expire_in" do
+    before do
+      obj.hsdq_session_set session_id, data2
+      obj.hsdq_session_expire session_id, 20
+    end
+
+    it { expect(obj.hsdq_session_expire_in session_id).to eq 20 }
+  end
+
 end
