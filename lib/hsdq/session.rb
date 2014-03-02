@@ -44,6 +44,10 @@ module Hsdq
       cx_session.ttl session_key(session_id)
     end
 
+    # check if a key exist in the session hash
+    def hsdq_session_key?(session_id, key)
+      cx_session.hexists session_key(session_id), key
+    end
 
   end
 end

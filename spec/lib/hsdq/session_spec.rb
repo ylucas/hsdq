@@ -82,4 +82,13 @@ RSpec.describe Hsdq::Session do
     it { expect(obj.hsdq_session_expire_in session_id).to eq 20 }
   end
 
+  describe "#hsdq_session_key?" do
+    before do
+      obj.hsdq_session_set session_id, data2
+    end
+
+    it { expect(obj.hsdq_session_key? session_id, "whatever").to be true }
+    it { expect(obj.hsdq_session_key? session_id, "nothing").to be false }
+  end
+
 end
