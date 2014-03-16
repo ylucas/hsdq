@@ -23,29 +23,46 @@ module Hsdq
     end
 
     def hsdq_running?
+      @hsdq_running = true if @hsdq_running.nil?
       @hsdq_running
     end
 
     def hsdq_stopped?
-      !@hsdq_running
+      !hsdq_running?
+    end
+
+    # useful for running once in test
+    def hsdq_exit?
+      @hsdq_exit = false if @hsdq_exit.nil?
+      @hsdq_exit
+    end
+
+    def hsdq_exit!
+      @hsdq_exit = true
     end
 
     # :nocov:
     def start_listener
-      Thread.new { hsdq_start(channel, {:threaded => true}) }
+      Thread.new { hsdq_start(channel) }
     end
     # :nocov:
 
     private
       # Listening loop
-      def hsdq_loop(channel)
-        p "listening started"
-        loop  do
+    def hsdq_loop(channel)
+      p "staring listening"
+      while hsdq_running?
+        if allow_new_threads? || !hsdq_opts[:threaded]
           raw_spark = cx_listener.blpop(channel, hsdq_opts[:timeout] )
           hsdq_ignit raw_spark, hsdq_opts if raw_spark
-          break if hsdq_stopped?
+        else
+          # :nocov:
+          sleep 0.01 # occur only when hsdq_max_threads is reached
+          # :nocov:
         end
+        hsdq_stop! if hsdq_exit?
       end
+    end
 
   end
 end

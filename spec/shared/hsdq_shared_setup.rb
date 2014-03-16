@@ -11,7 +11,7 @@ class HsdqTestClient
     # run the loop only one time for testing pupose
   def hsdq_start_one(channel, options={})
     hsdq_opts(options)
-    hsdq_stop!
+    hsdq_exit!
     hsdq_loop(channel)
   end
 
