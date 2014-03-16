@@ -16,9 +16,7 @@ module Hsdq
       validate_spark spark, options
       if hsdq_opts[:threaded]
         # :nocov:
-        Thread.new do
-          sparkle spark, options
-        end
+        hssdq_start_thread -> { sparkle spark, options }
         # :nocov:
       else
         sparkle spark, options
