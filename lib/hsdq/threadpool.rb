@@ -6,13 +6,17 @@ module Hsdq
       @max_thread_count ||= hsdq_opts[:max_thread_count] || 10
     end
 
-    def allow_new_threads(allowed)
-      @allow_new_threads = allowed
+    def paused(paused)
+      @paused = paused
+    end
+
+    def paused?
+      @paused = false if @paused.nil?
+      @paused
     end
 
     def allow_new_threads?
-      @allow_new_threads = true if @allow_new_threads.nil?
-      @allow_new_threads
+      hsdq_threads_count < max_thread_count && !paused?
     end
 
     def hsdq_threads
@@ -29,6 +33,7 @@ module Hsdq
 
     def hsdq_start_thread(ignition)
       t = Thread.new(&ignition)
+      p "New thread: #{t}"
       hsdq_threads_add t
     end
 

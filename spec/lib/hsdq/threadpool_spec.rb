@@ -27,19 +27,33 @@ RSpec.describe Hsdq::Threadpool do
     end
   end
 
-  describe "allow_new_threads" do
-     it { expect(obj.allow_new_threads false).to be false }
-     it { expect(obj.allow_new_threads true).to be true }
+  describe "#paused" do
+     it { expect(obj.paused true).to be true }
+     it { expect(obj.paused false).to be false }
+  end
+
+  describe "#paused?" do
+    context "default to false" do
+      it { expect(obj.paused?).to be false }
+    end
+
+    context "when set to true" do
+      before { obj.paused true }
+
+      it { expect(obj.paused?).to be true }
+    end
   end
 
   describe "#allow_new_threads?" do
-    context "default to true" do
+    context "not paused and below max threads" do
       it { expect(obj.allow_new_threads?).to be true }
     end
-
-    context "when set to false" do
-      before { obj.allow_new_threads false }
-
+    context "paused" do
+      before { obj.paused true }
+      it { expect(obj.allow_new_threads?).to be false }
+    end
+    context "paused" do
+      before { obj.max_thread_count 0 }
       it { expect(obj.allow_new_threads?).to be false }
     end
   end
@@ -53,20 +67,21 @@ RSpec.describe Hsdq::Threadpool do
       tg = obj.hsdq_threads
       expect(tg.list.size).to eq 0
 
-      obj.hsdq_threads_add Thread.new {}
+      obj.hsdq_threads_add Thread.new {sleep 0.2}
 
       expect(tg.list.size).to eq 1
     end
   end
 
   describe "#hsdq_thread_count" do
-    before { obj.hsdq_threads_add Thread.new {} }
+    before { obj.hsdq_threads_add Thread.new {sleep 0.2} }
 
     it { expect(obj.hsdq_threads_count).to eq 1 }
   end
 
   describe "#start_thread" do
-    before { obj.hsdq_start_thread(->{})}
+    before {
+      obj.hsdq_start_thread(->{sleep 0.2})}
 
     it { expect(obj.hsdq_threads_count).to eq 1 }
   end
