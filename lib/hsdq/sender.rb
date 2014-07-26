@@ -9,10 +9,11 @@ module Hsdq
   module Sender
     include Connectors
 
-    # to use by your application to send a request from your hsdq class. This is a Proxy for hsdq_send to send request messages
+    # To be use by your application to send a request from your hsdq class. This is a Proxy for hsdq_send to send request messages
     #
     # @param [Hash] Request message you want to send
     # @return [Hash] your original message with the system additional parameters
+    # @return [Boolean] false if the message's validation failed
     def hsdq_send_request(message)
       hsdq_send(message.merge(type: :request))
     end
@@ -23,6 +24,7 @@ module Hsdq
     #
     # @param [Hash] acknowledge you want to send
     # @return [Hash] your original message with the system additional parameters
+    # @return [Boolean] false if the message's validation failed
     def hsdq_send_ack(message)
       hsdq_send(message.merge(type: :ack))
     end
@@ -31,6 +33,7 @@ module Hsdq
     #
     # @param [Hash] callback message you want to send
     # @return [Hash] your original message with the system additional parameters
+    # @return [Boolean] false if the message's validation failed
     def hsdq_send_callback(message)
       hsdq_send(message.merge(type: :callback))
     end
@@ -39,6 +42,7 @@ module Hsdq
     #
     # @param [Hash] feedback message you want to send
     # @return [Hash] your original message with the system additional parameters
+    # @return [Boolean] false if the message's validation failed
     def hsdq_send_feedback(message)
       hsdq_send(message.merge(type: :feedback))
     end
@@ -49,16 +53,18 @@ module Hsdq
     #
     # @param [Hash] error message you want to send
     # @return [Hash] your original message with the system additional parameters
+    # @return [Boolean] false if the message's validation failed
     def hsdq_send_error(message)
       hsdq_send(message.merge(type: :error))
     end
 
     # Generic method to send any type of message. It is preferred to use the the send proxy methods that are setting
-    # the correct type for the messate the application has to send: hsdq_send_request, callback etc..
+    # the correct type for the message the application has to send: hsdq_send_request, callback etc..
     # The message type must be provided.
     #
     # @param [Hash] message to send
-    # @return [Hash] original message with the system additional parameters
+    # @return [Hash] original message with the system additional parameters if the message is sent
+    # @return [Boolean] false if the message's validation failed
     def hsdq_send(message)
       message = prepare_message message
       if valid_keys?(message) && valid_type?(message[:type])
@@ -72,6 +78,7 @@ module Hsdq
     # Send the message using a Redis multi in order to do everything within a single transaction
     # @param [Hash] message to send, will be stored as an entry in the message hash
     # @param [Hash] spark the ephemeral part of the message. pushed to a list
+    # @return [String] "OK"
     def send_message(message, spark)
       # avoid further processing into the multi redis command
       channel_name = message[:sent_to]
@@ -101,7 +108,7 @@ module Hsdq
       message
     end
 
-    # generate the spark from the message. The spark is ephemeral so everything in the spark is included into the message hash.
+    # Generate the spark from the message. The spark is ephemeral so everything in the spark is included into the message hash.
     # @param [Hash] message to be sent
     # @return [Hash] spark, the tiny part pushed to the list
     def build_spark(message)
@@ -110,7 +117,7 @@ module Hsdq
       spark
     end
 
-    # validate that the minimun necessary keys are present into the message befoe sendng it.
+    # Validate that the minimum necessary keys are present into the message before sending it.
     # @param [Hash] the full message to be sent (including the system data)
     def valid_keys?(message)
       [:sender, :sent_to, :type, :uid] - message.keys == []
