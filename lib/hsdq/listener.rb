@@ -12,8 +12,8 @@ module Hsdq
     include Connectors
 
     # Start hsdq to listen to channel.
-    # @param [String] channel, the channel the hsdq class will be listening
-    # @param [Hash] options the hsdq class option from the config file and/or additional parameters passed
+    # @param [String] channel The channel the hsdq class will be listening
+    # @param [Hash] options The hsdq class option from the config file and/or additional parameters passed
     def hsdq_start(channel, options=hsdq_opts)
       hsdq_opts(options)
       hsdq_run!

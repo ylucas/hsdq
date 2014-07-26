@@ -8,8 +8,8 @@ module Hsdq
     # **Placeholder for request received. You must override hsdq_request in your HsdqXxx class**<br>
     # After this method has run, there will be no further processing.
     #
-    # @param [Hash] message, the message to process
-    # @param [Hash] context, the request that was originally sent.
+    # @param [Hash] message The message to process
+    # @param [Hash] context The request that was originally sent.
     # @return [String] placeholder string message, will be what your method will be returning.
     def hsdq_request(message, context);  placeholder; end
     # **Placeholder for ack received. You must override hsdq_request in your HsdqXxx class**
@@ -28,8 +28,8 @@ module Hsdq
     # Send the ACk and start the processing for the message just received.<br>
     # The processing will be either executed synchronously or a new thread will be started based on the configuration.
     #
-    # @param [Json string] spark (ephemeral) just popped out of the queue in json format
-    # @param [Hash] HsdqXxx class configuration options
+    # @param [Json string] raw_spark (ephemeral) just popped out of the queue in json format
+    # @param [Hash] options HsdqXxx class configuration options
     def hsdq_ignit(raw_spark, options)
       spark = h_spark raw_spark
       send_ack spark
@@ -49,7 +49,7 @@ module Hsdq
     end
 
     # return the spark (ephemeral part of the message) from the message list
-    # @param [Json string or Array] from the list
+    # @param [Json string or Array] raw_spark from the list
     # @return [Hash] spark ready to be used by the system
     def h_spark(raw_spark)
       JSON.parse get_spark(raw_spark), {symbolize_names: true}
@@ -62,7 +62,7 @@ module Hsdq
     # - Call one of the 5 methods (request, ack, callback, feedback, error) in your hsdqXxx class (or the placeholder)
     # based on the message type
     # @param [Hash] spark
-    # @param [Hash] hsdq class options from setup
+    # @param [Hash] options hsdq class options from setup
     def sparkle(spark, options)
       puts spark.inspect
       burst, ctx_burst = get_burst spark, options
@@ -97,7 +97,7 @@ module Hsdq
     # - the burst (persistent action) associated with the spark from the matching Redis hash
     # - if needed the context data
     # @param [Hash] spark
-    # @param [Hash] options for the app
+    # @param [Hash] _options for the app (not used actually)
     def get_burst(spark, _options={})
       # get the context parameters
       context_h = spark[:context]
@@ -122,7 +122,7 @@ module Hsdq
 
     # Execute a multi transaction to get the burst and the context from Redis in a single call
     # @param [Proc] burst_p query to pull the burst from redis
-    # @param [Proc] context_p query to pull the context from redis
+    # @param [Proc] burst_context_p query to pull the context from redis
     # @return [array] [burst, context]
     def pull_burst(burst_p, burst_context_p)
       cx_data.multi do
@@ -174,8 +174,8 @@ module Hsdq
     end
 
     # Send an error message back to the sender
-    # @param [Hash] Spark
-    # @param [ArgumentError] if invalid
+    # @param [Hash] spark The rejected spark
+    # @param [ArgumentError] e if invalid
     # @return [Hash] the error message
     def reject_spark(spark, e)
       error = {
@@ -203,14 +203,14 @@ module Hsdq
     end
 
     # Cached value of the tasks authorized to be processed
-    # @param [Array] Additional tasks to the one setup in the configuration file
+    # @param [Array] tasks Additional tasks to the one setup in the configuration file
     # @return [Array] the authoriced tasks
     def hsdq_authorized_tasks(*tasks)
       @hsdq_authorized_tasks ||= [hsdq_opts[:tasks], [tasks]].flatten
     end
 
     # Cached value of the topics authorized to be processed
-    # @param [Array] Additional tasks to the one setup in the configuration file
+    # @param [Array] topics Additional tasks to the one setup in the configuration file
     # @return [Array] the authoriced topics
     def hsdq_authorized_topics(*topics)
       @hsdq_authorized_topics ||= [hsdq_opts[:topics], [topics]].flatten

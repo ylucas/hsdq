@@ -1,17 +1,14 @@
-require 'redis'
 
-require_relative "../../lib/hsdq/connectors"
-
+module Hsdq
 # This module is holding the methods for the sender (emitter) for your hsdq class.
 #
 # It is holding proxy methods setting the correct type to send your messages
-module Hsdq
   module Sender
     include Connectors
 
     # To be use by your application to send a request from your hsdq class. This is a Proxy for hsdq_send to send request messages
     #
-    # @param [Hash] Request message you want to send
+    # @param [Hash] message The request you want to send
     # @return [Hash] your original message with the system additional parameters
     # @return [Boolean] false if the message's validation failed
     def hsdq_send_request(message)
@@ -22,7 +19,7 @@ module Hsdq
     #
     # Ack is sent automatically by the system. This method is to send additional ack messages if needed. (very seldom used)
     #
-    # @param [Hash] acknowledge you want to send
+    # @param [Hash] message for the acknowledge you want to send (sent automatically by the system)
     # @return [Hash] your original message with the system additional parameters
     # @return [Boolean] false if the message's validation failed
     def hsdq_send_ack(message)
@@ -31,7 +28,7 @@ module Hsdq
 
     # Callback messages are the final step for a successful response.
     #
-    # @param [Hash] callback message you want to send
+    # @param [Hash] message for the callback you want to send
     # @return [Hash] your original message with the system additional parameters
     # @return [Boolean] false if the message's validation failed
     def hsdq_send_callback(message)
@@ -40,7 +37,7 @@ module Hsdq
 
     # Feedback messages are the intermediate messages used to update the sender of the progress of it's request.
     #
-    # @param [Hash] feedback message you want to send
+    # @param [Hash] message for the feedback you want to send
     # @return [Hash] your original message with the system additional parameters
     # @return [Boolean] false if the message's validation failed
     def hsdq_send_feedback(message)
@@ -51,7 +48,7 @@ module Hsdq
     #
     # Error messages are also automatically sent by the system in case of validation error at message recetion.
     #
-    # @param [Hash] error message you want to send
+    # @param [Hash] message for the error message you want to send
     # @return [Hash] your original message with the system additional parameters
     # @return [Boolean] false if the message's validation failed
     def hsdq_send_error(message)
@@ -95,7 +92,7 @@ module Hsdq
     end
 
     # Complete the message with the key values needed by the system
-    # @param [Hash] message original
+    # @param [Hash] message original message
     # @return [Hash] message with the additional system data
     def prepare_message(message)
       message[:sender]           = channel
@@ -118,7 +115,7 @@ module Hsdq
     end
 
     # Validate that the minimum necessary keys are present into the message before sending it.
-    # @param [Hash] the full message to be sent (including the system data)
+    # @param [Hash] message The full message to be sent (including the system data)
     def valid_keys?(message)
       [:sender, :sent_to, :type, :uid] - message.keys == []
     end

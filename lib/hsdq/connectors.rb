@@ -8,7 +8,7 @@ module Hsdq
   # segregate the different usages.
   #
   # In production of large applications you should use different instances for the different layers.
-  # This is setup in the configuration file hsdq_yourclass.yml
+  # The configuration files are named after your class name hsdq_yourclass.yml
   module Connectors
 
     # Establish the listener connection.
