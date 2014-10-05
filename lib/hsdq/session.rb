@@ -1,7 +1,10 @@
 module Hsdq
   module Session
 
-    # store in a hash the session layer either a hash or an array of key values (string or json)
+    # Store in the session layer in the session hash one or an array of key values (string or json)
+    # Create the session hash if it do not exist.
+    # @param [String] session_id Use session_key to create the namespaced key based on session_id
+    # @param [Hash or Array of key/values] key_values
     def hsdq_session_set(session_id, *key_values)
       key_values = key_values[0].to_a if 1 == key_values.flatten.size && key_values[0].is_a?(Hash)
       hkey = session_key(session_id)
@@ -12,8 +15,11 @@ module Hsdq
       end
     end
 
-    # return either an array of values in the order of the keys
-    # or in the case of no subkeys passed, return a hash of all the data stored
+    # Retrieve the session hash from the session layer and return the data (see below)
+    # @param [String] session_id used to build the unique namespaced key to retrieve the session hash
+    # @param [Array of String] keys either an array of keys or nil or nothing
+    # @return [Array] of values in the order of the keys passed
+    # @return [Hash] in the case of no keys passed, return a hash of all the data stored
     def hsdq_session(session_id, *keys)
       if keys.any?
         #get only the provided keys

@@ -1,5 +1,6 @@
 
 module Hsdq
+  # The methods in this module are shared by different modules
   module Shared
 
     def placeholder
