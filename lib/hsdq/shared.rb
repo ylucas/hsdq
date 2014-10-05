@@ -25,7 +25,7 @@ module Hsdq
     # @return [String] the unique namespaced key
     # @return nil if spark or the spark_uid is nil
     def burst_key(spark)
-      return unless spark &&
+      return unless spark
       "#{spark[:type]}_#{spark[:spark_uid]}" if spark[:type] && spark[:spark_uid]
     end
 
