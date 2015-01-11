@@ -1,0 +1,42 @@
+development:
+  redis:
+    message:
+      host: 127.0.0.1
+      port: 6379
+      db:   0
+    admin:
+      host: 127.0.0.1
+      port: 6379
+      db:   0
+    session:
+      host: 127.0.0.1
+      port: 6379
+      db:   0
+test:
+  redis:
+    message:
+      host: 127.0.0.1
+      port: 6379
+      db:   2
+    admin:
+      host: 127.0.0.1
+      port: 6379
+      db:   2
+    session:
+      host: 127.0.0.1
+      port: 6379
+      db:   2
+production:
+  redis:
+    message:
+      host: 127.0.0.1
+      port: 6395
+      db:   5
+    admin:
+      host: 127.0.0.1
+      port: 6395
+      db:   5
+    session:
+      host: 127.0.0.1
+      port: 6395
+      db:   5
