@@ -7,6 +7,7 @@
 
 require 'redis'
 require 'json'
+require 'securerandom'
 
 require_relative "hsdq/shared"
 require_relative "hsdq/connectors"
