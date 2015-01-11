@@ -15,19 +15,25 @@ module Hsdq
     # IMPORTANT this connection is blocked by the listener and must not be used elsewhere
     # @return [Redis connection] For the listener exclusively
     def cx_listener
-      @cx_listener ||= Redis.new
+      @cx_listener ||= Redis.new cx_opts[:message]
     end
 
     # Establish an unblocked connection for the sender and also pulling data from Redis
     # @return [Redis connection] This connection is used to send messages as well as to retrieve data from the message hash
     def cx_data
-      @cx_data ||= Redis.new
+      @cx_data ||= Redis.new cx_opts[:message]
     end
 
     # establish an unblocked connection for the session layer
     # @return [Redis connection] reserved for storing and retrieving the sessions data
     def cx_session
-      @cx_session ||= Redis.new
+      @cx_session ||= Redis.new cx_opts[:session]
+    end
+
+    # establish a connection for the admin channel pub/sub
+    # @return [Redis connection] reserved for the admin commands
+    def cx_admin
+      @cx_admin ||= Redis.new cx_opts[:admin]
     end
   end
 end
