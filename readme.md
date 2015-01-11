@@ -78,19 +78,23 @@ Note you can in simple cases like in scripts only use topic or task but it is re
 
 ####Step 5:
 Setup the hsdq config file:  
-In the config folder create a file name `hsdq_my_class.yml`  
+In the config folder create a file name `hsdq_my_class.yml` There ia a sample file in hsdq config folder
 
 `
-development:  
-  message:  
-    host: 127.0.0.1  
-    port: 6379  
-  admin:  
-    host: 127.0.0.1   
-    port: 6379  
-  session:  
-    host: 127.0.0.1  
-    port: 6379  
+development:
+  redis:
+    message:
+      host: 127.0.0.1
+      port: 6379
+      db:   0
+    admin:
+      host: 127.0.0.1
+      port: 6379
+      db:   0
+    session:
+      host: 127.0.0.1
+      port: 6379
+      db:   0
 `
 
 ## Message specifications
@@ -148,6 +152,7 @@ Multiple feedback can be sent before the callback/error and multiple events can 
 | tstamp         | I     | UTC    | Timestamp for the event UTC                                      |
 | context        | I     | Hash   | Data from the previous request. keys: :reply_to, spark_uid       |
 | previous_sender| I     | String | The previous sender of a request. used in chained queries        |
+| hsdq_session   | O     | String | Key to load session data related to the context                  |
 
 `M` Mandatory, `O` Optional (but recommended for pre-filtering), `I` Hsdq internal
 
@@ -156,6 +161,7 @@ Multiple feedback can be sent before the callback/error and multiple events can 
 
 **The spark:**   
 
-The spark has the same structure and values to the exception of the params and data keys which can contain heavy payloads.
+The spark has the same structure and values as the burst except it do not carry the payload.
+The params and data as well as eventual custom keys keys which can contain heavy payloads are not included.
 
 
