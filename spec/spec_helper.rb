@@ -4,7 +4,7 @@ SimpleCov.start do
 end
 
 require 'rubygems'
-require 'debugger'
+require 'byebug'
 
 RAILS_ENV = "test"
 
