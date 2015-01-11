@@ -20,6 +20,26 @@ module Hsdq
       }
     end
 
+    def cx_opts
+      @cx_options ||= {
+        message: {
+          host: '127.0.0.1',
+          port: 6379,
+          db:   2
+        },
+        admin: {
+          host: '127.0.0.1',
+          port: 6379,
+          db:   2
+        },
+        session: {
+          host: '127.0.0.1',
+          port: 6379,
+          db:   2
+        }
+      }.merge hsdq_opts[:redis] || {}
+    end
+
     # Read the config file
     # @param [String] file_path
     # @return [Hash] options from defult and config
