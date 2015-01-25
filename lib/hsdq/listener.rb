@@ -71,7 +71,7 @@ module Hsdq
     # The timeout allow the idle process to watch at regular interval if there is an admin command.
     # The process is listeing only if there is available thread to be started in the pool
     def hsdq_loop(channel)
-      p "staring listening"
+      p "starting listening channel #{channel}"
       while hsdq_running?
         if allow_new_threads? || !hsdq_opts[:threaded]
           raw_spark = cx_listener.blpop(channel, hsdq_opts[:timeout] )

@@ -44,7 +44,8 @@ RSpec.describe Hsdq::Listener do
 
     it "get the spark" do
       expect(obj).to receive(:sparkle).exactly(1).times
-      obj.cx_data.rpush("my-channel", {message: "my message"}.to_json)
+      # obj.cx_data.rpush("my-channel", {message: "my message"}.to_json)
+      obj.cx_data.rpush("my-channel", basic_empty_message.to_json)
       obj.hsdq_start_one("my-channel", test_options)
     end
   end

@@ -33,13 +33,14 @@ module Hsdq
     def hsdq_ignit(raw_spark, options)
       spark = h_spark raw_spark
       send_ack spark
-      validate_spark spark, options
-      if hsdq_opts[:threaded]
-        # :nocov:
-        hssdq_start_thread -> { sparkle spark, options }
-        # :nocov:
-      else
-        sparkle spark, options
+      if   valid_spark? spark, options
+        if hsdq_opts[:threaded]
+          # :nocov:
+          hssdq_start_thread -> { sparkle spark, options }
+          # :nocov:
+        else
+          sparkle spark, options
+        end
       end
     end
 
@@ -145,14 +146,14 @@ module Hsdq
     # @param [Hash] options Application options
     # @return [Boolean] true in case of valid spark,
     # @return [Hash] the error message if an error is raised
-    def validate_spark(spark, options)
+    def   valid_spark?(spark, options)
       begin
         raise ArgumentError.new("Illegal type #{spark[:type]}") unless valid_type? spark[:type]
-        check_whitelist spark, options if 'request' == spark[:type]
+        'request' == spark[:type] ? check_whitelist(spark, options) : true
       rescue => e
         reject_spark spark, e
+        false
       end
-
     end
 
     # Call whitelisted? to verify the the topic and task are legit.
@@ -162,9 +163,10 @@ module Hsdq
     # @return [Hash] the error message if an error is raised
     def check_whitelist(spark, options)
       begin
-        raise ArgumentError.new("Illegal argument in topic or task") unless whitelisted? spark, options
+        whitelisted?(spark, options) ? true : (raise ArgumentError.new("Illegal argument in topic or task"))
       rescue => e
         reject_spark spark, e
+        false
       end
     end
 
@@ -216,13 +218,15 @@ module Hsdq
       @hsdq_authorized_topics ||= [hsdq_opts[:topics], [topics]].flatten
     end
 
+    # test the task against the list of authorised tasks
+    #
     def valid_task?(spark, _options)
-      return true unless spark[:task] # nil values ok by default add option to reject nil
+      return true if spark[:task].nil? || hsdq_authorized_tasks.empty?
       hsdq_authorized_tasks.include?(spark[:task].to_sym)
     end
 
     def valid_topic?(spark, _options)
-      return true unless spark[:topic] # nil values ok by default add option to reject nil
+      return true if spark[:topic].nil? || hsdq_authorized_topics.empty?
       hsdq_authorized_topics.include?(spark[:topic].to_sym)
     end
 

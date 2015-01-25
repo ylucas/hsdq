@@ -3,7 +3,7 @@ require_relative '../../shared/hsdq_shared_setup'
 RSpec.describe Hsdq::Receiver do
   include_context "setup_shared"
 
-  let(:simple_spark_h)    { {message: "my message"} }
+  let(:simple_spark_h)    { basic_empty_message }
   let(:simple_spark)      { simple_spark_h.to_json }
   let(:simple_raw_spark)  { ["a_channel", simple_spark] }
   let(:empty_options)     { {} }
@@ -41,7 +41,6 @@ RSpec.describe Hsdq::Receiver do
     before do
       allow(obj).to receive(:h_spark) { simple_spark_h }
       allow(obj).to receive(:send_ack)
-      allow(obj).to receive(:validate_spark)
       allow(obj).to receive(:sparkle)
     end
 
@@ -56,15 +55,16 @@ RSpec.describe Hsdq::Receiver do
       obj.hsdq_ignit(simple_spark, {whatever: "options"})
     end
     it "set hash for spark" do
-      expect(obj).to receive(:validate_spark).with(simple_spark_h, {whatever: "options"})
+      expect(obj).to receive(:valid_spark?).with(simple_spark_h, {whatever: "options"})
 
       obj.hsdq_ignit(simple_spark, {whatever: "options"})
     end
     it "start the processing in #sparkle" do
-      expect(obj).to receive(:sparkle).with(simple_spark_h, {whatever: "options"})
+      expect(obj).to receive(:sparkle) #.with(simple_spark_h, {whatever: "options"})
 
       obj.hsdq_ignit(simple_spark, {whatever: "options"})
     end
+
     # unstable test due to the thread
     # it "start the processing in #sparkle when threaded" do
     #   expect(obj).to receive(:sparkle).with(simple_spark_h, {whatever: "options"})
@@ -150,18 +150,18 @@ RSpec.describe Hsdq::Receiver do
     end
   end
 
-  describe "#validate_spark" do
+  describe "#valid_spark?" do
     before { allow(obj).to receive(:check_whitelist) { true } }
 
     it "do not raise if type is valid" do
       allow(obj).to receive(:whitelisted?) { true }
 
-      expect {obj.validate_spark(valid_spark, empty_options)}.not_to raise_error
+      expect {obj.valid_spark?(valid_spark, empty_options)}.not_to raise_error
     end
     it "raise if type is not valid" do
       allow(obj).to receive(:valid_type?) { false }
 
-      expect {obj.validate_spark(simple_spark, empty_options)}.to raise_exception
+      expect {obj.valid_spark?(simple_spark, empty_options)}.to raise_exception
     end
   end
 
