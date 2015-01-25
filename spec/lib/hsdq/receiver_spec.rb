@@ -158,10 +158,16 @@ RSpec.describe Hsdq::Receiver do
 
       expect {obj.valid_spark?(valid_spark, empty_options)}.not_to raise_error
     end
-    it "raise if type is not valid" do
+    it "send error message if type is not valid" do
+      allow(obj).to receive(:valid_type?) { false }
+      expect(obj).to receive(:reject_spark)
+
+      obj.valid_spark?(simple_spark_h, empty_options)
+    end
+    it "return false in case of invalid type" do
       allow(obj).to receive(:valid_type?) { false }
 
-      expect {obj.valid_spark?(simple_spark, empty_options)}.to raise_exception
+      expect(obj.valid_spark?(simple_spark_h, empty_options)).to eq false
     end
   end
 
@@ -169,12 +175,18 @@ RSpec.describe Hsdq::Receiver do
     it "do not raise if whitelisted" do
       allow(obj).to receive(:whitelisted?) { true }
 
-      expect {obj.check_whitelist(simple_spark, empty_options)}.not_to raise_error
+      expect {obj.check_whitelist(simple_spark_h, empty_options)}.not_to raise_error
     end
-    it "raise if not whitelisted" do
+    it "send error message if not whitelisted" do
+      allow(obj).to receive(:whitelisted?) { false }
+      expect(obj).to receive(:reject_spark)
+
+      obj.check_whitelist(simple_spark_h, empty_options)
+    end
+    it "is false if not whitelisted" do
       allow(obj).to receive(:whitelisted?) { false }
 
-      expect {obj.check_whitelist(simple_spark, empty_options)}.to raise_exception
+      expect(obj.check_whitelist(simple_spark_h, empty_options)).to eq false
     end
   end
 
