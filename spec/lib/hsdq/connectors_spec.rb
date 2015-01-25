@@ -15,4 +15,8 @@ RSpec.describe Hsdq::Connectors do
     it { expect(obj.cx_session).to be_an_instance_of Redis }
   end
 
+  describe "#cx_admin connection" do
+    it { expect(obj.cx_admin).to be_an_instance_of Redis }
+  end
+
 end
