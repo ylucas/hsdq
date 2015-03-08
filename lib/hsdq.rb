@@ -8,6 +8,7 @@
 require 'redis'
 require 'json'
 require 'securerandom'
+require 'byebug'
 
 require_relative "hsdq/shared"
 require_relative "hsdq/connectors"
@@ -18,6 +19,7 @@ require_relative "hsdq/receiver"
 require_relative "hsdq/thread_store"
 require_relative "hsdq/session"
 require_relative "hsdq/threadpool"
+require_relative "hsdq/admin"
 
 module Hsdq
   include Shared
@@ -29,6 +31,7 @@ module Hsdq
   include ThreadStore
   include Session
   include Threadpool
+  include Admin
 
   Thread.abort_on_exception = true # Uncomment for debugging
 

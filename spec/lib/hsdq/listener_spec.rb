@@ -3,9 +3,9 @@ require_relative '../../shared/hsdq_shared_setup'
 RSpec.describe Hsdq::Listener do
   include_context "setup_shared"
 
-  describe "#hsdq_run!" do
+  describe "#hsdq_start!" do
     it "set hsdq_running? to true" do
-      obj.hsdq_run!
+      obj.hsdq_start!
       expect(obj.hsdq_running?).to eq true
     end
   end
@@ -63,7 +63,7 @@ RSpec.describe Hsdq::Listener do
   describe "#hsdq_start" do
     it "load the options, setup runnning start the loop" do
       expect(obj).to receive(:hsdq_opts).with({whatever: "options"})
-      expect(obj).to receive(:hsdq_run!)
+      expect(obj).to receive(:hsdq_start!)
       expect(obj).to receive(:hsdq_loop).with("one_channel")
 
       obj.hsdq_start "one_channel", {whatever: "options"}
