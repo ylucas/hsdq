@@ -53,8 +53,8 @@ module Hsdq
           hsdq_start!
         when 'exit'
           hsdq_exit!
-        when 'kill'
-          # hsdq_kill! # here kill all the threads and exit
+        # when 'kill'
+          # hsdq_kill! # here kill all the threads and exit. todo
       end
     end
 
