@@ -57,8 +57,8 @@ module Hsdq
     # @return [String] The environment string
     # @default 'development'
     def environment(environment=nil)
-      environment  ||= (defined?(Rails) ? Rails.env : nil) || RAILS_ENV || 'development'
-      @environment ||= environment
+      environment  ||= (defined?(Rails) ? Rails.env : nil) || (RAILS_ENV if constant_defined? RAILS_ENV)
+      @environment ||= environment || 'development'
     end
 
     # utility method (equivalent to Rails underscore)
