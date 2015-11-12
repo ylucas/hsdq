@@ -11,8 +11,8 @@ Gem::Specification.new do |spec|
 
   spec.summary       = %q{Hsdq, High Speed Distributed Queue for message bus.}
   spec.description   = %q{Hsdq: Light weight and distributed, Hsdq allow distributed applications to exchange requests and data at high speed, work in parallel and scale horizontaly.}
-  # spec.homepage      = "TODO: Put your gem's website or public repo URL here."
-  spec.license       = "GPL-3.0"
+  spec.homepage      = "github.com/ylucas/gsdq"
+  spec.license       = "MIT"
 
   spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features|examples)/}) }
   spec.bindir        = "bin"
