@@ -1,3 +1,8 @@
+# different host / port can be used to split the different usage
+# Redis is mono threaded so the same server can also run different instances on different ports
+# session can be separate for different group of applications
+# You need one separate file for each hsdq class
+# below setup for 2 instances of Redis: port 6379 with 2 databases (message and admin) port 6380 for session
 development:
   redis:
     message:
@@ -7,10 +12,10 @@ development:
     admin:
       host: 127.0.0.1
       port: 6379
-      db:   0
+      db:   1
     session:
       host: 127.0.0.1
-      port: 6379
+      port: 6380
       db:   0
 test:
   redis:
