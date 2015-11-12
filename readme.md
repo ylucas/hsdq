@@ -78,9 +78,16 @@ Note you can in simple cases like in scripts only use topic or task but it is re
 
 ####Step 5:
 Setup the hsdq config file:  
-In the config folder create a file name `hsdq_my_class.yml` There ia a sample file in hsdq config folder
 
-`
+In the config folder create a file name `hsdq_my_class.yml` There ia a sample file in hsdq config folder.
+
+- Each class you connect to HSDQ must have it's specific yml file. This allow you to shard the bus for heavy
+ traffic application.
+- Each subsection can point to a different Redis instance/host/db.  
+ For heavy traffic sites, you can shard messages and have for example a unique host for admin.
+- Session can be split to different host if different applications do not share the sessions data
+
+```
 development:
   redis:
     message:
@@ -95,7 +102,7 @@ development:
       host: 127.0.0.1
       port: 6379
       db:   0
-`
+```
 
 ## Message specifications
 
