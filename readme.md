@@ -16,7 +16,11 @@
 ## Dependencies
 
 * HSDQ rely on Redis for the transport layer
-* Ruby 2.1.4, Jruby mode 1.9 should work too
+
+## Recommended
+
+* Ruby 2.2.3, Minimun ruby 2
+* Jruby 9.0.3
 
 ## How to use HSDQ
 
