@@ -45,7 +45,7 @@ module Hsdq
 
     def process_admin_message(_admin_channel, admin_message_j)
       admin_message = JSON.parse(admin_message_j) rescue {'params' => {'task' => ""}}
-      task = admin_message['params']['task']
+      task = admin_message['params'] ? admin_message['params']['task'] : ""
       case task
         when 'stop'
           hsdq_stop!
@@ -53,8 +53,6 @@ module Hsdq
           hsdq_start!
         when 'exit'
           hsdq_exit!
-        # when 'kill'
-          # hsdq_kill! # here kill all the threads and exit. todo
       end
     end
 
