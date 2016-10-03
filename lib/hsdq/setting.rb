@@ -5,7 +5,8 @@ module Hsdq
   module Setting
 
     # Cached hash of the options thus avoiding to pass options all over the place.
-    # initial state read the options from the config file if any provided and merge in it the opts parameter
+    # Initial state read the options from the config file if any provided and merge in it the opts
+    # parameter
     # @param [Hash] opts The Options to be added/merged into the options from the config file
     # @return [Hash] of the options
     def hsdq_opts(opts={})
@@ -15,8 +16,8 @@ module Hsdq
     # @return [Hash] the default options
     def default_opts
       @default_opts ||= {
-        :threaded => false,
-        :timeout  => 10
+        threaded: false,
+        timeout:  10
       }
     end
 
