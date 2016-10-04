@@ -51,19 +51,23 @@ module Hsdq
     # The listener needs to be restarted specifically, if need to run again
     # @return [Boolean] true when allowing the listener to stay in listening mode
     def hsdq_alive?
-      @hsdq_alive ||= true
+      @hsdq_alive = true if @hsdq_alive.nil?
+      @hsdq_alive
     end
 
-    # Flag breaking the listening loop if true. True for normal operation.
-    # This is useful for running once in test or for later use to stop and exit the process
+    # Flag break the listening loop if true.
     # @return [Boolean]
     def hsdq_exit?
-      @hsdq_exit = false if @hsdq_exit.nil?
       @hsdq_exit
     end
 
     # Set exit to force the listening loop to exit.
     def hsdq_exit!
+      @hsdq_exit = true
+    end
+
+    # stops the listening loop
+    def kill_alive!
       @hsdq_alive = false
     end
 
@@ -81,7 +85,6 @@ module Hsdq
     # The process is listeing only if there is available thread to be started in the pool
     def hsdq_loop(channel)
       p "starting listening channel #{channel}"
-      # while hsdq_running?
       while hsdq_alive?
         if (allow_new_threads? || !hsdq_opts[:threaded]) && hsdq_running?
           raw_spark = cx_listener.blpop(channel, hsdq_opts[:timeout] )
@@ -91,7 +94,7 @@ module Hsdq
           sleep 0.01 # occur only when hsdq_max_threads is reached
           # :nocov:
         end
-        hsdq_exit! if hsdq_exit?
+        kill_alive! if hsdq_exit?
       end
     end
 

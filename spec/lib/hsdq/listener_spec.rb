@@ -31,7 +31,7 @@ RSpec.describe Hsdq::Listener do
 
   describe "#hsdq_exit?" do
     context "init" do
-      it { expect(obj.hsdq_exit?).to be false }
+      it { expect(obj.hsdq_exit?).to be_falsy }
     end
     context "#hsdq_exit! actionned" do
       before { obj.hsdq_exit! }
@@ -44,7 +44,6 @@ RSpec.describe Hsdq::Listener do
 
     it "get the spark" do
       expect(obj).to receive(:sparkle).exactly(1).times
-      # obj.cx_data.rpush("my-channel", {message: "my message"}.to_json)
       obj.cx_data.rpush("my-channel", basic_empty_message.to_json)
       obj.hsdq_start_one("my-channel", test_options)
     end

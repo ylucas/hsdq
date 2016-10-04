@@ -23,8 +23,8 @@ RSpec.shared_context 'setup_shared' do
 
   def test_options
     {
-      :threaded => false,
-      :timeout  => 1
+      threaded: false,
+      timeout:  1,
     }
   end
 
