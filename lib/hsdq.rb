@@ -1,8 +1,8 @@
 # Hsdq: is a High Speed Distributed message Queue built on top of Redis.
 # @see Readme.md
 #
-# This software Copyright 2013-2014 Yves Lucas
-# License GPLv3, see LICENSE.txt
+# This software Copyright 2013-2016 Yves Lucas
+# License MIT, see LICENSE.txt
 #
 
 require 'redis'
