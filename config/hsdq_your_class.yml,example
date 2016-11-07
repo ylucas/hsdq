@@ -1,47 +1,63 @@
+# This file should be in your Rails app config folder, or for script / non Rails app be accessible
+# by your app
 # different host / port can be used to split the different usage
 # Redis is mono threaded so the same server can also run different instances on different ports
 # session can be separate for different group of applications
 # You need one separate file for each hsdq class
-# below setup for 2 instances of Redis: port 6379 with 2 databases (message and admin) port 6380 for session
-development:
-  redis:
-    message:
-      host: 127.0.0.1
-      port: 6379
-      db:   0
-    admin:
-      host: 127.0.0.1
-      port: 6379
-      db:   1
-    session:
-      host: 127.0.0.1
-      port: 6380
-      db:   0
-test:
-  redis:
-    message:
-      host: 127.0.0.1
-      port: 6379
-      db:   2
-    admin:
-      host: 127.0.0.1
-      port: 6379
-      db:   2
-    session:
-      host: 127.0.0.1
-      port: 6379
-      db:   2
-production:
-  redis:
-    message:
-      host: 127.0.0.1
-      port: 6395
-      db:   5
-    admin:
-      host: 127.0.0.1
-      port: 6395
-      db:   5
-    session:
-      host: 127.0.0.1
-      port: 6395
-      db:   5
+# below setup for 2 instances of Redis:
+# - port 6379 with 2 databases (message db 1 and admin db 0)
+# - port 6380 for session
+# any app/script/class that need to exchange messages together should share the same setup, it is
+# strongly suggested to use same setup for all apps at the beginning.
+# The flexibility of this setup file is for scaling and sharding the busses.
+:development:
+  :redis:
+    :message:
+      :host: 127.0.0.1
+      :port: 6379
+      :db:   1
+    :admin:
+      :host: 127.0.0.1
+      :port: 6379
+      :db:   2
+    :session:
+      :host: 127.0.0.1
+      :port: 6380
+      :db:   1
+  :exceptions: true
+  :threaded:   false
+  :timeout:    10
+:test:
+  :redis:
+    :message:
+      :host: 127.0.0.1
+      :port: 6379
+      :db:   2
+    :admin:
+      :host: 127.0.0.1
+      :port: 6379
+      :db:   2
+    :session:
+      :host: 127.0.0.1
+      :port: 6379
+      :db:   2
+  :exceptions: true
+  :threaded:   false
+  :timeout:    10
+:production:
+  :redis:
+    :message:
+      :host: 127.0.0.1
+      :port: 6395
+      :db:   5
+    :admin:
+      :host: 127.0.0.1
+      :port: 6395
+      :db:   5
+    :session:
+      :host: 127.0.0.1
+      :port: 6395
+      :db:   5
+  :exceptions: false
+  :threaded:   true
+  :timeout:    10
