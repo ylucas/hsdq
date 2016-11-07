@@ -71,8 +71,18 @@ RSpec.describe Hsdq::Setting do
   end
 
   context "file present" do
-    context "no config file" do
-      it { expect(obj.read_opts('./spec/shared/minimum_config.yml')).to eq ({threaded: true, timeout: 10}) }
+    let(:good_setup) do
+      {threaded: true,
+       timeout:  9,
+       redis:    {message: {host: "127.0.0.1", port: 6379, db: 2},
+                  admin:   {host: "127.0.0.1", port: 6379, db: 2},
+                  session: {host: "127.0.0.1", port: 6379, db: 2}
+                 }
+      }
+    end
+
+    context "with config file" do
+      it { expect(obj.read_opts('./spec/shared/test_config.yml')).to eq good_setup }
     end
   end
 
