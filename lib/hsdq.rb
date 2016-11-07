@@ -33,7 +33,4 @@ module Hsdq
   include Threadpool
   include Admin
 
-  Thread.abort_on_exception = true # Uncomment for debugging
-
-
 end

@@ -10,7 +10,13 @@ module Hsdq
     # @param [Hash] opts The Options to be added/merged into the options from the config file
     # @return [Hash] of the options
     def hsdq_opts(opts={})
-      @hsdq_opts ||= read_opts.merge opts
+      @hsdq_opts ||= initial_setup opts
+    end
+
+    def initial_setup(opts)
+      options = read_opts.merge opts
+      set_abort_on_exception(options)
+      options
     end
 
     # @return [Hash] the default options
@@ -106,6 +112,13 @@ module Hsdq
     # @return [String] The value for the path to the config file
     def config_file_path(config_file_path=nil)
       @config_file_path ||= config_file_path || File.join(config_path, config_filename)
+    end
+
+    # sets abort_on_exception for debugging based on environment or parameter
+    def set_abort_on_exception(options)
+      # return unless %w(test development).include? environment && hsdq_opts[:exceptions] == true
+      return unless options[:exceptions] == true
+      Thread.abort_on_exception = true
     end
 
   end

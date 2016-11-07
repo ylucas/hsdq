@@ -87,4 +87,26 @@ RSpec.describe Hsdq::Setting do
     end
   end
 
+  describe "#set_abort_on_exception" do
+    context "parameter :exceptions is true" do
+
+      before do
+        obj.hsdq_opts(exceptions: true)
+      end
+
+      it { expect(Thread.abort_on_exception).to eq true }
+    end
+  end
+
+  describe "#set_abort_on_exception" do
+    context "parameter :exceptions is false" do
+
+      before do
+        obj.hsdq_opts(exceptions: false)
+      end
+
+      it { expect(Thread.abort_on_exception).to eq false }
+    end
+  end
+
 end
