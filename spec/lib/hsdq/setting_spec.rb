@@ -72,7 +72,8 @@ RSpec.describe Hsdq::Setting do
 
   context "file present" do
     let(:good_setup) do
-      {threaded: true,
+      {exceptions: true,
+       threaded: true,
        timeout:  9,
        redis:    {message: {host: "127.0.0.1", port: 6379, db: 2},
                   admin:   {host: "127.0.0.1", port: 6379, db: 2},

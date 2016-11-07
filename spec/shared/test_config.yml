@@ -1,6 +1,7 @@
 :test:
-  :threaded: true
-  :timeout:  9
+  :exceptions: true
+  :threaded:   true
+  :timeout:    9
   :redis:
     :message:
       :host: 127.0.0.1
