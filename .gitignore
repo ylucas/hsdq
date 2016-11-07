@@ -6,6 +6,9 @@ coverage
 spec/tmp/*
 **.orig
 rerun.txt
+.byebug_history
+.ruby_gemset
+.ruby_version
 
 # Ignore bundler config.
 .bundle
