@@ -1,4 +1,4 @@
-
+# require 'yaml'
 
 module Hsdq
   # This module provide the original setting for the hsdq class as well as some utility methods
@@ -46,8 +46,8 @@ module Hsdq
     # @return [Hash] options from defult and config
     def read_opts(file_path=nil)
       begin
-        default_opts.merge YAML.load_file(file_path || config_file_path)[:"#{environment}"]
-      rescue
+        default_opts.merge! YAML.load_file(file_path || config_file_path)[:"#{environment}"]
+      rescue => e
         puts "[warning] config file not read, using default options"
         default_opts
       end
@@ -58,8 +58,11 @@ module Hsdq
     # @return [String] The environment string
     # @default 'development'
     def environment(environment=nil)
-      environment  ||= (defined?(Rails) ? Rails.env : nil) || (RAILS_ENV if constant_defined? RAILS_ENV)
-      @environment ||= environment || 'development'
+      @environment ||= environment_from_app(environment) || 'development'
+    end
+
+    def environment_from_app(environment)
+      environment || (defined?(Rails) ? Rails.env : nil) || (RAILS_ENV if defined? RAILS_ENV)
     end
 
     # utility method (equivalent to Rails underscore)
