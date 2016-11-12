@@ -1,4 +1,4 @@
-# require 'yaml'
+require_relative 'utilities'
 
 module Hsdq
   # This module provide the original setting for the hsdq class as well as some utility methods
@@ -69,13 +69,6 @@ module Hsdq
 
     def environment_from_app(environment)
       environment || (defined?(Rails) ? Rails.env : nil) || (RAILS_ENV if defined? RAILS_ENV)
-    end
-
-    # utility method (equivalent to Rails underscore)
-    # @param [String] string a class/constant name
-    # @return [String] underscored string from a class name
-    def snakify(string)
-      string.split(/(?=[A-Z])/).map(&:downcase).join('_')
     end
 
     # @param [String] name the HsdqClassName

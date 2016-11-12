@@ -21,10 +21,6 @@ RSpec.describe Hsdq::Setting do
     end
   end
 
-  describe "#snakify" do
-    it { expect(obj.snakify("MyGoodClass")).to eq 'my_good_class' }
-  end
-
   describe "#channel=" do
     before { obj.channel = "my_channel" }
     it { expect(obj.channel).to eq "my_channel" }
