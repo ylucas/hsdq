@@ -19,8 +19,8 @@
 
 ## Recommended
 
-* Ruby 2.2.3, Minimun ruby 2
-* Jruby 9.0.3
+* Ruby 2.3.1, Minimum ruby 2
+* Jruby 9.1.2 Minimum 9.0.3
 
 ## How to use HSDQ
 
