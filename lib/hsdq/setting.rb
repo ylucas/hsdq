@@ -115,10 +115,12 @@ module Hsdq
     end
 
     # sets abort_on_exception for debugging based on environment or parameter
+    #
+    # @param [Hash] options If options[exception] true,
+    # the main thread will break if a child thread break which is what we want in development/test
+    # but we do not want that for production
     def set_abort_on_exception(options)
-      # return unless %w(test development).include? environment && hsdq_opts[:exceptions] == true
-      return unless options[:exceptions] == true
-      Thread.abort_on_exception = true
+      options[:exceptions] ? Thread.abort_on_exception = true : Thread.abort_on_exception = false
     end
 
   end

@@ -4,11 +4,11 @@ RSpec.describe Hsdq::Setting do
   include_context "setup_shared"
 
   describe "#default_opts" do
-    it { expect( obj.default_opts).to eq ({:threaded => false, :timeout  => 10}) }
+    it { expect(obj.default_opts).to eq ({:threaded => false, :timeout  => 10}) }
   end
 
   describe "#hsdq_opts" do
-    it { expect( obj.hsdq_opts({:threaded=>true})).to eq ({:threaded => true, :timeout  => 10}) }
+    it { expect(obj.hsdq_opts({:threaded=>true})).to eq ({:threaded => true, :timeout  => 10}) }
   end
 
   describe "#environmemt" do
@@ -96,9 +96,7 @@ RSpec.describe Hsdq::Setting do
 
       it { expect(Thread.abort_on_exception).to eq true }
     end
-  end
 
-  describe "#set_abort_on_exception" do
     context "parameter :exceptions is false" do
 
       before do
