@@ -36,7 +36,7 @@ module Hsdq
       if   valid_spark? spark, options
         if hsdq_opts[:threaded]
           # :nocov:
-          hssdq_start_thread -> { sparkle spark, options }
+          hsdq_start_thread -> { sparkle spark, options }
           # :nocov:
         else
           sparkle spark, options
@@ -207,15 +207,37 @@ module Hsdq
     # Cached value of the tasks authorized to be processed
     # @param [Array] tasks Additional tasks to the one setup in the configuration file
     # @return [Array] the authoriced tasks
-    def hsdq_authorized_tasks(*tasks)
-      @hsdq_authorized_tasks ||= [hsdq_opts[:tasks], [tasks]].flatten
+    def hsdq_authorized_tasks
+      @hsdq_authorized_tasks ||= [hsdq_opts[:tasks]].flatten
     end
 
     # Cached value of the topics authorized to be processed
-    # @param [Array] topics Additional tasks to the one setup in the configuration file
+    def hsdq_authorized_topics
+      @hsdq_authorized_topics ||= [hsdq_opts[:topics]].flatten
+    end
+
+    # @param [Array] tasks REPLACE the tasks set in the configuration file if any
+    # @return [Array] the authoriced tasks
+    def hsdq_set_authorized_tasks(*tasks)
+      @hsdq_authorized_tasks = tasks.flatten
+    end
+
+    # @param [Array] topics REPLACE the topics set in the configuration file if any
     # @return [Array] the authoriced topics
-    def hsdq_authorized_topics(*topics)
-      @hsdq_authorized_topics ||= [hsdq_opts[:topics], [topics]].flatten
+    def hsdq_set_authorized_topics(*topics)
+      @hsdq_authorized_topics = topics.flatten
+    end
+
+    # @param [Array] tasks Additional tasks to the ones set in the configuration file
+    # @return [Array] the authoriced tasks
+    def hsdq_add_authorized_tasks(*tasks)
+      @hsdq_authorized_tasks = [hsdq_authorized_tasks, tasks].flatten
+    end
+
+    # @param [Array] topics Additional topics to the ones set in the configuration file
+    # @return [Array] the authoriced topics
+    def hsdq_add_authorized_topics(*topics)
+      @hsdq_authorized_topics = [hsdq_authorized_topics, topics].flatten
     end
 
     # test the task against the list of authorised tasks

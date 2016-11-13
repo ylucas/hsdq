@@ -191,9 +191,9 @@ RSpec.describe Hsdq::Receiver do
   end
 
   describe "#whitelisted?" do
-    before() do
-      obj.hsdq_authorized_tasks auth_tasks
-      obj.hsdq_authorized_topics auth_topics
+    before do
+      obj.hsdq_set_authorized_tasks auth_tasks
+      obj.hsdq_set_authorized_topics auth_topics
     end
 
     context "valid spark" do
@@ -257,16 +257,28 @@ RSpec.describe Hsdq::Receiver do
     it { expect(obj.hsdq_authorized_types).to eq [:request, :ack, :feedback, :callback, :error] }
   end
 
-  describe "hsdq_authorized_tasks" do
-    before { obj.hsdq_opts[:tasks] = [:clean, :shop] }
+  describe "hsdq_add_authorized_tasks" do
+    before { obj.hsdq_opts(tasks: [:clean, :shop]) }
     let(:tasks) { [:eat, [:drink]] }
-    it { expect(obj.hsdq_authorized_tasks(tasks)).to eq [:clean, :shop, :eat, :drink] }
+    it { expect(obj.hsdq_add_authorized_tasks(tasks)).to eq [:clean, :shop, :eat, :drink] }
   end
 
-  describe "hsdq_authorized_topics" do
+  describe "hsdq_add_authorized_topics" do
     before { obj.hsdq_opts[:topics] = [:dishes, :milk] }
     let(:topics) { [:fish, [:vodka]] }
-    it { expect(obj.hsdq_authorized_topics(topics)).to eq [:dishes, :milk, :fish, :vodka] }
+    it { expect(obj.hsdq_add_authorized_topics(topics)).to eq [:dishes, :milk, :fish, :vodka] }
+  end
+
+  describe "hsdq_set_authorized_tasks" do
+    before { obj.hsdq_opts(tasks: [:clean, :shop]) }
+    let(:tasks) { [:eat, [:drink]] }
+    it { expect(obj.hsdq_set_authorized_tasks(tasks)).to eq [:eat, :drink] }
+  end
+
+  describe "hsdq_set_authorized_topics" do
+    before { obj.hsdq_opts[:topics] = [:dishes, :milk] }
+    let(:topics) { [:fish, [:vodka]] }
+    it { expect(obj.hsdq_set_authorized_topics(topics)).to eq [:fish, :vodka] }
   end
 
 end
