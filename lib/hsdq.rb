@@ -11,6 +11,7 @@ require 'securerandom'
 require 'yaml'
 
 require_relative "hsdq/shared"
+require_relative "hsdq/utilities"
 require_relative "hsdq/connectors"
 require_relative "hsdq/listener"
 require_relative "hsdq/sender"
@@ -23,6 +24,7 @@ require_relative "hsdq/admin"
 
 module Hsdq
   include Shared
+  include Utilities
   include Connectors
   include Listener
   include Sender
