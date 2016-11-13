@@ -1,4 +1,3 @@
-require_relative 'utilities'
 
 module Hsdq
   # This module provide the original setting for the hsdq class as well as some utility methods
@@ -11,6 +10,16 @@ module Hsdq
     # @return [Hash] of the options
     def hsdq_opts(opts={})
       @hsdq_opts ||= initial_setup opts
+    end
+
+    # allow to add opions before listening
+    # @params [Hash] opts the options to add
+    def hsdq_add_options(opts)
+      if @hsdq_opts
+        @hsdq_opts.merge!(opts)
+      else
+        hsdq_opts(opts)
+      end
     end
 
     def initial_setup(opts)
@@ -52,9 +61,10 @@ module Hsdq
     # @return [Hash] options from defult and config
     def read_opts(file_path=nil)
       begin
-        default_opts.merge! YAML.load_file(file_path || config_file_path)[:"#{environment}"]
-      rescue => e
-        puts "[warning] config file not read, using default options"
+        default_opts.merge!(
+          deep_symbolize(YAML.load_file(file_path || config_file_path))[environment.to_sym])
+      rescue Errno::ENOENT => e
+        p "[warning] config file not read, using default options"
         default_opts
       end
     end

@@ -1,6 +1,6 @@
-require 'redis'
-
+require "redis"
 require_relative "connectors"
+require_relative "utilities"
 
 module Hsdq
   # This module is holding the methods for the class listener.
@@ -14,8 +14,8 @@ module Hsdq
     # Start hsdq to listen to channel.
     # @param [String] channel The channel the hsdq class will be listening
     # @param [Hash] options The hsdq class option from the config file and/or additional parameters passed
-    def hsdq_start(channel, options=hsdq_opts)
-      hsdq_opts(options)
+    def hsdq_start(channel, options)
+      hsdq_add_options(options) if options
       hsdq_start!
       hsdq_loop(channel)
     end
@@ -73,8 +73,8 @@ module Hsdq
 
     # Start the listener
     # :nocov:
-    def start_listener
-      Thread.new { hsdq_start(channel) }
+    def start_listener(options={})
+      Thread.new { hsdq_start(channel, options) }
       Thread.new { admin_listener }
     end
     # :nocov:
