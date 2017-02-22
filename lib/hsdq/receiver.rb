@@ -207,13 +207,21 @@ module Hsdq
     # Cached value of the tasks authorized to be processed
     # @param [Array] tasks Additional tasks to the one setup in the configuration file
     # @return [Array] the authoriced tasks
-    def hsdq_authorized_tasks
-      @hsdq_authorized_tasks ||= [hsdq_opts[:tasks]].flatten
+    def hsdq_authorized_tasks(*tasks)
+      if tasks.any?
+        @hsdq_authorized_tasks = [tasks].flatten
+      else
+        @hsdq_authorized_tasks ||= [hsdq_opts[:tasks]].flatten
+      end
     end
 
     # Cached value of the topics authorized to be processed
-    def hsdq_authorized_topics
-      @hsdq_authorized_topics ||= [hsdq_opts[:topics]].flatten
+    def hsdq_authorized_topics(*topics)
+      if topics.any?
+        @hsdq_authorized_topics = [topics].flatten
+      else
+        @hsdq_authorized_topics ||= [hsdq_opts[:topics]].flatten
+      end
     end
 
     # @param [Array] tasks REPLACE the tasks set in the configuration file if any
